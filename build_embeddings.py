@@ -235,16 +235,30 @@ def get_embeddings(texts, client, model="text-embedding-3-small"):
     )
     return np.array([d.embedding for d in response.data], dtype="float32")
 
+# ========== OUTPUT PATHS ==========
+def get_output_paths(source_path, embeddings_dir="./embeddings", chunks_dir="./chunks"):
+    """
+    Given a source file path, returns (embeddings_path, chunks_path)
+    with the same base name but .npy and .json extensions.
+    """
+    base = os.path.splitext(os.path.basename(source_path))[0]
+    embeddings_path = os.path.join(embeddings_dir, f"{base}_embeddings.npy")
+    chunks_path = os.path.join(chunks_dir, f"{base}_chunks.json")
+    return embeddings_path, chunks_path
+
 # ========== MAIN WORKFLOW ==========
 def embedding_generator(
     FILE_PATH,
-    EMBEDDINGS_PATH,
-    CHUNKS_PATH,
     BATCH_SIZE=20,
     TOC_PAGE=None,
     heading_columns=None,
     filter_dict=None
 ):
+    # Get output paths based on source file name
+    EMBEDDINGS_PATH, CHUNKS_PATH = get_output_paths(FILE_PATH)
+    os.makedirs(os.path.dirname(EMBEDDINGS_PATH), exist_ok=True)
+    os.makedirs(os.path.dirname(CHUNKS_PATH), exist_ok=True)
+
     ext = os.path.splitext(FILE_PATH)[1].lower()
     print(f"Processing file: {FILE_PATH}")
 
@@ -331,15 +345,11 @@ def embedding_generator(
 if __name__ == "__main__":
     # Example usage for CSV/XLSX:
     FILE_PATH = "./source/DH-SRD-May202025.pdf"  # or .csv, .pdf, .docx, .txt
-    EMBEDDINGS_PATH = "./embeddings/rules_embeddings.npy"
-    CHUNKS_PATH = "./chunks/rules_chunks.json"
     # For CSV/XLSX, specify columns to use as headings and any filters:
     heading_columns = []  # or any columns you want
     filter_dict = {}        # or {} for no filter
     embedding_generator(
         FILE_PATH,
-        EMBEDDINGS_PATH,
-        CHUNKS_PATH,
         heading_columns=heading_columns,
         filter_dict=filter_dict
     )
