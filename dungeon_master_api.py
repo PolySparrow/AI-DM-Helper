@@ -7,6 +7,7 @@ import logging_function
 import numpy as np
 import faiss_search
 import dungeon_master_functions as dm_functions
+import search_files
 
 # Setup logger
 logger = logging_function.setup_logger()
@@ -33,7 +34,7 @@ def get_embeddings(texts, client):
 def search_route():
     data = request.get_json()
     query = data.get("query", "")
-    results = faiss_search.search(query, k=3)
+    results=search_files.hybrid_search(query, k=5)
     return jsonify({"results": results})
 
 @app.route('/api/v1.0/chat', methods=['POST'])

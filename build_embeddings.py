@@ -48,12 +48,31 @@ def extract_text_from_txt(txt_path: str) -> str:
     with open(txt_path, 'r', encoding='utf-8') as file:
         return file.read()
 
-def extract_text_from_docx(docx_path: str) -> str:
+# ========== DOCX SECTION CHUNKING ==========
+def extract_sections_from_docx(docx_path: str):
+    """
+    Returns a list of (heading_dict, section_text) for each section in the DOCX,
+    using Heading styles.
+    """
     doc = Document(docx_path)
-    text = ""
+    sections = []
+    current_heading = None
+    current_section = []
     for para in doc.paragraphs:
-        text += para.text + '\n'
-    return text
+        style = para.style.name if para.style else ""
+        text = para.text.strip()
+        if not text:
+            continue
+        if style.startswith("Heading"):
+            if current_section and current_heading:
+                sections.append(({"Section": current_heading}, "\n".join(current_section)))
+            current_heading = text
+            current_section = []
+        else:
+            current_section.append(text)
+    if current_section and current_heading:
+        sections.append(({"Section": current_heading}, "\n".join(current_section)))
+    return sections
 
 # ========== TABLE (CSV/XLSX) EXTRACTION ==========
 def extract_chunks_from_table(
@@ -143,10 +162,13 @@ def extract_section_headings(toc_text):
     return headings
 
 def chunk_by_paragraph(text):
-    paragraphs = [p.strip() for p in re.split(r'\n\s*\n', text) if p.strip()]
-    return paragraphs
+    return [p.strip() for p in re.split(r'\n\s*\n', text) if p.strip()]
 
 def chunk_by_headings(text, headings):
+    """
+    Splits text into sections by headings.
+    Returns a list of (heading_dict, section_text).
+    """
     normalized_headings = [h.strip().lower() for h in headings]
     lines = text.split('\n')
     sections = []
@@ -165,6 +187,20 @@ def chunk_by_headings(text, headings):
     if current_section and current_title:
         sections.append(({"Section": current_title}, "\n".join(current_section).strip()))
     return sections
+
+def chunk_sections_to_paragraphs(sections):
+    """
+    Given a list of (heading_dict, section_text), split each section into paragraphs,
+    assigning the heading to each paragraph.
+    Returns a list of (heading_dict, paragraph) tuples.
+    """
+    result = []
+    for heading_dict, section_text in sections:
+        paragraphs = split_into_paragraphs(section_text)
+        for para in paragraphs:
+            if para.strip():
+                result.append((heading_dict, para.strip()))
+    return result
 
 def re_chunk_sections(sections, max_tokens=8191):
     max_chars = max_tokens * 4
@@ -237,10 +273,6 @@ def get_embeddings(texts, client, model="text-embedding-3-small"):
 
 # ========== OUTPUT PATHS ==========
 def get_output_paths(source_path, embeddings_dir="./embeddings", chunks_dir="./chunks"):
-    """
-    Given a source file path, returns (embeddings_path, chunks_path)
-    with the same base name but .npy and .json extensions.
-    """
     base = os.path.splitext(os.path.basename(source_path))[0]
     embeddings_path = os.path.join(embeddings_dir, f"{base}_embeddings.npy")
     chunks_path = os.path.join(chunks_dir, f"{base}_chunks.json")
@@ -254,7 +286,6 @@ def embedding_generator(
     heading_columns=None,
     filter_dict=None
 ):
-    # Get output paths based on source file name
     EMBEDDINGS_PATH, CHUNKS_PATH = get_output_paths(FILE_PATH)
     os.makedirs(os.path.dirname(EMBEDDINGS_PATH), exist_ok=True)
     os.makedirs(os.path.dirname(CHUNKS_PATH), exist_ok=True)
@@ -273,6 +304,7 @@ def embedding_generator(
         )
         raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
         sections = raw_sections
+
     elif ext == ".pdf":
         print("Searching for Table of Contents page...")
         toc_page = TOC_PAGE
@@ -285,26 +317,31 @@ def embedding_generator(
             print("ToC not found, defaulting to page 2.")
             toc_text = extract_page_text(FILE_PATH, 1)
         headings = extract_section_headings(toc_text)
-        if headings:
-            print(f"Section headings found in ToC: {headings}")
-            raw_sections = chunk_by_headings(extract_text_from_pdf(FILE_PATH), headings)
-            raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
-            sections = re_chunk_sections(raw_sections, max_tokens=7000)
-        else:
-            print("No section headings found, chunking by paragraph.")
-            paragraphs = chunk_by_paragraph(extract_text_from_pdf(FILE_PATH))
-            paragraphs = [preprocess_text(p, patterns) for p in paragraphs]
-            sections = re_chunk_paragraphs(paragraphs, max_tokens=7000)
+        print(f"Section headings found in ToC: {headings}")
+        full_text = extract_text_from_pdf(FILE_PATH)
+        # Chunk by section heading
+        section_chunks = chunk_by_headings(full_text, headings)
+        # Now split each section into paragraphs, assigning the heading
+        raw_sections = chunk_sections_to_paragraphs(section_chunks)
+        # Preprocess after heading assignment
+        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
+        sections = re_chunk_sections(raw_sections, max_tokens=7000)
+
     elif ext == ".docx":
-        print("Extracting and chunking DOCX...")
-        paragraphs = chunk_by_paragraph(extract_text_from_docx(FILE_PATH))
-        paragraphs = [preprocess_text(p, patterns) for p in paragraphs]
-        sections = re_chunk_paragraphs(paragraphs, max_tokens=7000)
+        print("Extracting and chunking DOCX by heading...")
+        section_chunks = extract_sections_from_docx(FILE_PATH)
+        raw_sections = chunk_sections_to_paragraphs(section_chunks)
+        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
+        sections = re_chunk_sections(raw_sections, max_tokens=7000)
+
     elif ext == ".txt":
         print("Extracting and chunking TXT...")
-        paragraphs = chunk_by_paragraph(extract_text_from_txt(FILE_PATH))
-        paragraphs = [preprocess_text(p, patterns) for p in paragraphs]
-        sections = re_chunk_paragraphs(paragraphs, max_tokens=7000)
+        full_text = extract_text_from_txt(FILE_PATH)
+        paragraphs = chunk_by_paragraph(full_text)
+        raw_sections = [(None, p) for p in paragraphs]
+        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
+        sections = re_chunk_sections(raw_sections, max_tokens=7000)
+
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
@@ -345,9 +382,8 @@ def embedding_generator(
 if __name__ == "__main__":
     # Example usage for CSV/XLSX:
     FILE_PATH = "./source/DH-SRD-May202025.pdf"  # or .csv, .pdf, .docx, .txt
-    # For CSV/XLSX, specify columns to use as headings and any filters:
-    heading_columns = []  # or any columns you want
-    filter_dict = {}        # or {} for no filter
+    heading_columns = []  # or any columns you want for CSV/XLSX
+    filter_dict = {}      # or {} for no filter
     embedding_generator(
         FILE_PATH,
         heading_columns=heading_columns,
