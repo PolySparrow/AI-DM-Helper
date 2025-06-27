@@ -40,7 +40,8 @@ class SmartOpenAIChat:
                     endpoint = f"http://127.0.0.1:5001/api/v1.0/{fn_name}"
                     logger.debug(f"Calling function {fn_name} with arguments {args} at endpoint {endpoint}")
                     returned_data = self.send_request(endpoint, args)
-                    return f"I used this function {fn_name} with arguments {args} and got the response: {returned_data}", fn_name
+                    results = returned_data.get("results")
+                    return f"I used this function {fn_name} with arguments {args} and got the response: \n\n {results}", fn_name
                 except Exception as e:
                     return f"Error calling function {fn_name}: {str(e)}", fn_name
             else:

@@ -1,6 +1,6 @@
 functions=[
             {
-                "name": "document_search",
+                "name": "search",
                 "description": "Search Documents for relvent information to user's query ",
                 "parameters": {
                     "type": "object",
@@ -9,7 +9,7 @@ functions=[
                         "document_type": {"type": "string", "description": "Which document to search in", "enum": ["daggerheart_srd", "dungeon_master_srd"]},
 
                     },
-                    "required": ["source"]
+                    "required": ["query"]
                 }
             }
 
