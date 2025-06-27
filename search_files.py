@@ -99,6 +99,6 @@ def hybrid_search(user_query, k=1, model="gpt-4o"):
 
 # ========== EXAMPLE USAGE ==========
 if __name__ == "__main__":
-    user_query = "When does the GM generate fear and what is fear?"
+    user_query = "what would ability should I use to swallow my own face or make the appearance of me doing so?"
     answer = hybrid_search(user_query, k=3)
     print("LLM's answer:\n", answer)
