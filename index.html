@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI DM Helper Smart Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Prism.js CSS for syntax highlighting -->
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.css" rel="stylesheet" />
+  <style>
+    body { background: #f8f0f0; }
+    .aidm-header {
+      color: #fff;
+      background: #8B0000;
+      border-radius: 16px 16px 0 0;
+      padding: 1em 1.5em;
+      margin-bottom: 0;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .chat-box {
+      height: 60vh;
+      min-height: 300px;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: #fff;
+      border: 2px solid #8B0000;
+      border-radius: 0 0 16px 16px;
+      padding: 1em;
+      margin-bottom: 1em;
+      box-shadow: 0 2px 8px rgba(139,0,0,0.04);
+      transition: height 0.2s;
+    }
+    .user-msg { text-align: right; color: #8B0000; font-weight: 500; }
+    .bot-msg { text-align: left; color: #B22222; font-weight: 500; }
+    .msg { margin: 0.5em 0; word-break: break-word; }
+    #chatInput { width: 100%; border: 2px solid #B22222; border-radius: 8px; }
+    .btn-primary { background: #B22222; border: none; }
+    .btn-primary:hover, .btn-primary:focus { background: #8B0000; }
+    .aidm-footer { color: #8B0000; font-size: 0.95em; margin-top: 1em; }
+    code { background: #f8f0f0; color: #8B0000; border-radius: 4px; padding: 2px 4px; }
+    pre { background: #fff5f5; border-radius: 8px; padding: 0.75em; margin: 0.5em 0; font-size: 1em; overflow-x: auto; }
+    @media (max-width: 600px) {
+      .container { padding: 0 0.5em !important; }
+      .aidm-header, .chat-box { border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="container py-4" style="max-width: 100%; max-width: 800px;">
+  <div class="aidm-header">
+    AI DM Helper Smart Chat
+  </div>
+  <div class="chat-box" id="chatBox"></div>
+  <form id="chatForm" class="d-flex">
+    <input id="chatInput" class="form-control me-2" type="text" placeholder="Type a message..." required autocomplete="off">
+    <button class="btn btn-primary" type="submit">Send</button>
+  </form>
+  <div class="aidm-footer">
+    <b>Examples:</b><br>
+    <code>How are you?</code><br>
+    <code>When does the DM Generate Fear?</code><br>
+    <code>Roll 2d12 one labelled Fear and the other Hope</code>
+  </div>
+</div>
+<!-- Prism.js for syntax highlighting -->
+<script>
+  let chatHistory = [
+    { role: "system", content: "You are a helpful assistant." }
+  ];
+
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, function(m) {
+      return ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[m];
+    });
+  }
+
+  // Removed renderBotMessage. Bot messages will be rendered as plain text with line breaks.
+  const chatBox = document.getElementById('chatBox');
+  document.getElementById('chatForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    chatHistory.push({ role: "user", content: msg });
+    chatBox.innerHTML += `<div class="msg user-msg"><b>You:</b> ${escapeHtml(msg)}</div>`;
+    chatBox.innerHTML += `<div class="msg bot-msg" id="botTyping">Bot is typing...</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+    input.value = '';
+    try {
+      const res = await fetch('http://localhost:5000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history: chatHistory })
+      });
+      const data = await res.json();
+      document.getElementById('botTyping').remove();
+      if (data.success) {
+        chatHistory.push({ role: "assistant", content: data.response });
+        // Just render as plain text with line breaks
+        chatBox.innerHTML += `<div class="msg bot-msg"><b>Bot:</b> <span>${escapeHtml(data.response).replace(/\n/g, "<br>")}</span></div>`;
+        Prism.highlightAll();
+      } else {
+        chatBox.innerHTML += `<div class="msg bot-msg"><b>Bot:</b> Error: ${escapeHtml(data.error)}</div>`;
+      }
+      chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (err) {
+      document.getElementById('botTyping').remove();
+      chatBox.innerHTML += `<div class="msg bot-msg"><b>Bot:</b> Request failed: ${escapeHtml(err.toString())}</div>`;
+    }
+  });
+</script>
+</body>
+</html>
