@@ -69,20 +69,28 @@ def hybrid_search(user_query, k=1, model="gpt-4o"):
         kb_results[kb_name] = search_kb(user_query, kb, k)
 
     prompt = (
-        "You are an expert RPG assistant. Here are possible answers from different knowledge bases:\n\n"
+    "You are an expert RPG assistant. Here are possible answers from different knowledge bases:\n\n"
     )
     for kb_name, results in kb_results.items():
         if results:
             for idx, result in enumerate(results):
-                prompt += f"{kb_name.capitalize()} (Rank {idx+1}, Score {result['score']:.2f}): {result['formatted']}\n"
+                section = ""
+                if result["headings"]:
+                    section = "Section: " + " | ".join(f"{k}: {v}" for k, v in result["headings"].items() if v)
+                prompt += (
+                    f"{kb_name.capitalize()} (Rank {idx+1}, Score {result['score']:.2f}):\n"
+                    f"{section}\n"
+                    f"{result['text']}\n"
+                )
         else:
             prompt += f"{kb_name.capitalize()}: No relevant info found.\n"
         prompt += "\n"
 
     prompt += (
         f'The user asked: "{user_query}"\n\n'
-        "First, explain the subject of the user's question in your own words, as an expert.\n"
+        "First, answer the subject of the user's question in your own words, as an expert.\n"
         "Then, pick the most relevant answer from the knowledge bases above, and explain why you chose it.\n"
+        "Be sure to state the section heading(s) where you found the answer.\n"
         "If none are relevant, say so."
     )
 
@@ -99,6 +107,6 @@ def hybrid_search(user_query, k=1, model="gpt-4o"):
 
 # ========== EXAMPLE USAGE ==========
 if __name__ == "__main__":
-    user_query = "How does hope work?"
+    user_query = "How much hope can a player have?"
     answer = hybrid_search(user_query, k=5)
     print("LLM's answer:\n", answer)
