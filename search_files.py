@@ -63,7 +63,7 @@ def search_kb(query, kb, k=1):
     print (f"Search results for '{query}' in {kb['index'].ntotal} items: {len(results)} found.")
     return results
 
-def hybrid_search(user_query, k=1, model="gpt-4o"):
+def hybrid_search(user_query, k=1, model="gpt-3.5-turbo"):
     kb_results = {}
     for kb_name, kb in knowledge_bases.items():
         kb_results[kb_name] = search_kb(user_query, kb, k)
