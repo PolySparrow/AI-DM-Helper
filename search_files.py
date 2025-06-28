@@ -63,50 +63,83 @@ def search_kb(query, kb, k=1):
     print (f"Search results for '{query}' in {kb['index'].ntotal} items: {len(results)} found.")
     return results
 
-def hybrid_search(user_query, k=1, model="gpt-3.5-turbo"):
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+# ---- 1. Choose and Load a Model ----
+# For best results, use a model with "Instruct" or "Chat" in the name.
+# See section 2 below for model recommendations.
+
+# Example: Mistral 7B Instruct (needs a good GPU)
+# model_name = "mistralai/Mistral-7B-Instruct-v0.2"
+
+# Example: TinyLlama (works on CPU, less capable)
+model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = model.to(device)
+
+# ---- 2. Format the Prompt ----
+def format_prompt(results, user_query):
+    prompt = "Here are the top relevant sections for the user's question:\n\n"
+    for idx, result in enumerate(results, 1):
+        section = ""
+        if result.get("headings"):
+            section = "Section: " + " | ".join(f"{k}: {v}" for k, v in result["headings"].items() if v)
+        prompt += f"{idx}. [{section}]\n{result['text']}\n\n"
+    prompt += (
+        f'User\'s question: "{user_query}"\n\n'
+        "Please answer the user's question using the information above. "
+        "Summarize or explain as needed, and cite the section(s) you used."
+    )
+    return prompt
+
+# ---- 3. Generate the Answer ----
+def summarize_with_hf(results, user_query, model, tokenizer, max_new_tokens=300):
+    prompt = format_prompt(results, user_query)
+    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            temperature=0.2,
+            pad_token_id=tokenizer.eos_token_id
+        )
+    answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    # Remove the prompt from the output if the model repeats it
+    if answer.startswith(prompt):
+        answer = answer[len(prompt):].strip()
+    return answer
+
+# ---- 4. Integrate with Your Search ----
+def hybrid_search_with_hf(user_query, k=5, model=None, tokenizer=None):
+    # You must define knowledge_bases and search_kb elsewhere in your code!
     kb_results = {}
     for kb_name, kb in knowledge_bases.items():
         kb_results[kb_name] = search_kb(user_query, kb, k)
 
-    prompt = (
-    "You are an expert RPG assistant. Here are possible answers from different knowledge bases:\n\n"
-    )
+    # Collect all results, flatten, and sort by score
+    all_results = []
     for kb_name, results in kb_results.items():
-        if results:
-            for idx, result in enumerate(results):
-                section = ""
-                if result["headings"]:
-                    section = "Section: " + " | ".join(f"{k}: {v}" for k, v in result["headings"].items() if v)
-                prompt += (
-                    f"{kb_name.capitalize()} (Rank {idx+1}, Score {result['score']:.2f}):\n"
-                    f"{section}\n"
-                    f"{result['text']}\n"
-                )
-        else:
-            prompt += f"{kb_name.capitalize()}: No relevant info found.\n"
-        prompt += "\n"
+        for result in results:
+            result_copy = result.copy()
+            result_copy["kb_name"] = kb_name
+            all_results.append(result_copy)
+    all_results.sort(key=lambda r: r["score"])
 
-    prompt += (
-        f'The user asked: "{user_query}"\n\n'
-        "First, answer the subject of the user's question in your own words, as an expert.\n"
-        "Then, pick the most relevant answer from the knowledge bases above, and explain why you chose it.\n"
-        "Be sure to state the section heading(s) where you found the answer.\n"
-        "If none are relevant, say so."
-    )
+    if not all_results:
+        return "No relevant information found in any knowledge base."
 
-    response = openai_client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": "You are a helpful RPG rules assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=512,
-        temperature=0.2
-    )
-    return response.choices[0].message.content
+    top_k = all_results[:k]
+    summary = summarize_with_hf(top_k, user_query, model, tokenizer)
+    return summary
 
-# ========== EXAMPLE USAGE ==========
+# ---- 5. Example Usage ----
 if __name__ == "__main__":
-    user_query = "How much hope can a player have?"
-    answer = hybrid_search(user_query, k=5)
-    print("LLM's answer:\n", answer)
+    user_query = "How does hope work?"
+    # You must define knowledge_bases and search_kb before this!
+    answer = hybrid_search_with_hf(user_query, k=5, model=model, tokenizer=tokenizer)
+    print(answer)
