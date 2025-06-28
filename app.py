@@ -10,7 +10,7 @@ import logging_function
 logger = logging_function.setup_logger()
 
 class SmartOpenAIChat:
-    def __init__(self, api_key, model="gpt-3.5-turbo"):
+    def __init__(self, api_key, model="o4-mini"):
         
         self.api_key = api_key
         self.model = model
