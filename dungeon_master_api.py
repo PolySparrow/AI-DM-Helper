@@ -43,6 +43,12 @@ def CallChat():
     response = dm_functions.Chat(f)
     return response
 
+@app.route('/api/v1.0/roll_dice', methods=['POST'])
+def roll_dice_route():
+    data = request.get_json()
+    dice_notation = data.get("dice", "")
+    result=dm_functions.roll_dice(dice_notation)
+
 if __name__ == "__main__":
     logger.debug("Starting the Dungeon Master API Flask app...")
     # Start the Flask app
