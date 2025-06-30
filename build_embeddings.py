@@ -8,16 +8,10 @@ import numpy as np
 from typing import Optional
 
 import PyPDF2
+import pdfplumber
 from docx import Document
 import openpyxl
-
-def extract_page_text(pdf_path: str, page_number: int) -> str:
-    with open(pdf_path, "rb") as file:
-        reader = PyPDF2.PdfReader(file)
-        if 0 <= page_number < len(reader.pages):
-            return reader.pages[page_number].extract_text() or ""
-        else:
-            return ""
+from sentence_transformers import SentenceTransformer
 
 # ========== PREPROCESSING ==========
 def preprocess_text(text, remove_patterns=None):
@@ -30,16 +24,264 @@ def preprocess_text(text, remove_patterns=None):
     text = re.sub(r'\s+', ' ', text).strip()
     text = text.replace('“', '"').replace('”', '"').replace('’', "'").replace('–', '-')
     return text
+# ========== TEXT EXTRACTION FROM TXT ==========
+def extract_text_from_txt(txt_path: str) -> str:
+    with open(txt_path, 'r', encoding='utf-8') as file:
+        return file.read()
+# ========== PDF PAGE EXTRACTION ==========
+def extract_page_text(pdf_path: str, page_number: int) -> str:
+    with open(pdf_path, "rb") as file:
+        reader = PyPDF2.PdfReader(file)
+        if 0 <= page_number < len(reader.pages):
+            return reader.pages[page_number].extract_text() or ""
+        else:
+            return ""
+        
+# ========== PDFPLUMBER CHUNKING FOR CORE RULES ==========
+def is_heading(word, font_size, min_font_size, min_len=4, max_words=6):
+    return (
+        word.isupper() and
+        font_size >= min_font_size and
+        min_len <= len(word) <= 40 and
+        1 <= len(word.split()) <= max_words and
+        not re.search(r'[^\w\s]', word)
+    )
+
+def chunk_pdf_with_fontsize(pdf_path):
+    import pdfplumber
+    import re
+
+    def is_heading(word, font_size, target_font, min_len=4, max_words=6):
+        return (
+            word.isupper() and
+            font_size == target_font and
+            min_len <= len(word) <= 40 and
+            1 <= len(word.split()) <= max_words and
+            not re.search(r'[^\w\s]', word)
+        )
+
+    with pdfplumber.open(pdf_path) as pdf:
+        # 1. Find the largest font sizes (rounded), skipping the first page
+        font_sizes = []
+        for page in pdf.pages[1:]:
+            for char in page.chars:
+                font_sizes.append(round(char["size"]))
+        font_sizes = sorted(set(font_sizes), reverse=True)
+        if len(font_sizes) < 5:
+            raise ValueError("Not enough font size variation to detect 4 heading layers.")
+        # Skip the largest (title) font size
+        main_section_font = font_sizes[1]
+        subsection_font = font_sizes[2]
+        subsubsection_font = font_sizes[3]
+        subsubsubsection_font = font_sizes[4]
+        print("Unique font sizes (descending, skipping title):", font_sizes)
+        print(f"Detected main section font size: {main_section_font}")
+        print(f"Detected subsection font size: {subsection_font}")
+        print(f"Detected subsubsection font size: {subsubsection_font}")
+        print(f"Detected subsubsubsection font size: {subsubsubsection_font}")
+
+        # 2. Parse and chunk
+        chunks = []
+        current_section = None
+        current_subsection = None
+        current_subsubsection = None
+        current_subsubsubsection = None
+        current_chunk_lines = []
+        current_page = 2  # Since we skip the first page
+
+        # For collecting the first 5 found headings at each layer
+        main_section_headings = []
+        subsection_headings = []
+        subsubsection_headings = []
+        subsubsubsection_headings = []
+
+        for page_num, page in enumerate(pdf.pages[1:], start=1):
+            words = page.extract_words(extra_attrs=["size"])
+            for w in words:
+                word_text = w["text"].strip()
+                font_size = round(w["size"])
+                # Main section
+                if is_heading(word_text, font_size, main_section_font):
+                    if len(main_section_headings) < 5:
+                        main_section_headings.append((word_text, page_num + 1))
+                    if current_chunk_lines and current_section:
+                        chunks.append({
+                            "section": current_section,
+                            "subsection": current_subsection,
+                            "subsubsection": current_subsubsection,
+                            "subsubsubsection": current_subsubsubsection,
+                            "page": current_page,
+                            "text": "\n".join(current_chunk_lines).strip()
+                        })
+                    current_section = word_text
+                    current_subsection = None
+                    current_subsubsection = None
+                    current_subsubsubsection = None
+                    current_chunk_lines = []
+                    current_page = page_num + 1
+                # Subsection
+                elif is_heading(word_text, font_size, subsection_font):
+                    if len(subsection_headings) < 5:
+                        subsection_headings.append((word_text, page_num + 1))
+                    if current_chunk_lines and current_section:
+                        chunks.append({
+                            "section": current_section,
+                            "subsection": current_subsection,
+                            "subsubsection": current_subsubsection,
+                            "subsubsubsection": current_subsubsubsection,
+                            "page": current_page,
+                            "text": "\n".join(current_chunk_lines).strip()
+                        })
+                    current_subsection = word_text
+                    current_subsubsection = None
+                    current_subsubsubsection = None
+                    current_chunk_lines = []
+                    current_page = page_num + 1
+                # Subsubsection
+                elif is_heading(word_text, font_size, subsubsection_font):
+                    if len(subsubsection_headings) < 5:
+                        subsubsection_headings.append((word_text, page_num + 1))
+                    if current_chunk_lines and current_section:
+                        chunks.append({
+                            "section": current_section,
+                            "subsection": current_subsection,
+                            "subsubsection": current_subsubsection,
+                            "subsubsubsection": current_subsubsubsection,
+                            "page": current_page,
+                            "text": "\n".join(current_chunk_lines).strip()
+                        })
+                    current_subsubsection = word_text
+                    current_subsubsubsection = None
+                    current_chunk_lines = []
+                    current_page = page_num + 1
+                # Subsubsubsection
+                elif is_heading(word_text, font_size, subsubsubsection_font):
+                    if len(subsubsubsection_headings) < 5:
+                        subsubsubsection_headings.append((word_text, page_num + 1))
+                    if current_chunk_lines and current_section:
+                        chunks.append({
+                            "section": current_section,
+                            "subsection": current_subsection,
+                            "subsubsection": current_subsubsection,
+                            "subsubsubsection": current_subsubsubsection,
+                            "page": current_page,
+                            "text": "\n".join(current_chunk_lines).strip()
+                        })
+                    current_subsubsubsection = word_text
+                    current_chunk_lines = []
+                    current_page = page_num + 1
+                else:
+                    current_chunk_lines.append(word_text)
+        if current_chunk_lines and current_section:
+            chunks.append({
+                "section": current_section,
+                "subsection": current_subsection,
+                "subsubsection": current_subsubsection,
+                "subsubsubsection": current_subsubsubsection,
+                "page": current_page,
+                "text": "\n".join(current_chunk_lines).strip()
+            })
+
+    # Print the first 5 main section and subsection headings found
+    print("\nFirst 5 main section headings and their pages:")
+    for heading, page in main_section_headings:
+        print(f"  '{heading}' on page {page}")
+    print("\nFirst 5 subsection headings and their pages:")
+    for heading, page in subsection_headings:
+        print(f"  '{heading}' on page {page}")
+    print("\nFirst 5 subsubsection headings and their pages:")
+    for heading, page in subsubsection_headings:
+        print(f"  '{heading}' on page {page}")
+    print("\nFirst 5 subsubsubsection headings and their pages:")
+    for heading, page in subsubsubsection_headings:
+        print(f"  '{heading}' on page {page}")
+
+    return chunks
+# ========== STAT BLOCK CHUNKING FOR ADVERSARIES.PDF ==========
+def chunk_stat_blocks_from_pdf(pdf_path: str):
+    stat_blocks = []
+    name_pattern = re.compile(r'^[A-Z][A-Z\s\-]+[A-Z]$')
+    skip_words = {"FEATURES"}
+
+    with open(pdf_path, "rb") as file:
+        reader = PyPDF2.PdfReader(file)
+        for page_num, page in enumerate(reader.pages):
+            text = page.extract_text() or ""
+            lines = text.split('\n')
+            current_block = []
+            current_name = None
+            for line in lines:
+                line_stripped = line.strip()
+                if name_pattern.match(line_stripped) and line_stripped not in skip_words:
+                    if current_block and current_name:
+                        stat_blocks.append({
+                            "name": current_name,
+                            "page": page_num + 1,
+                            "text": "\n".join(current_block).strip()
+                        })
+                    current_name = line_stripped
+                    current_block = [line_stripped]
+                else:
+                    if current_block is not None:
+                        current_block.append(line)
+            if current_block and current_name:
+                stat_blocks.append({
+                    "name": current_name,
+                    "page": page_num + 1,
+                    "text": "\n".join(current_block).strip()
+                })
+    return stat_blocks
+
+# ========== DOMAIN CARD CHUNKING FROM PDF ==========
+def chunk_domain_cards_from_pdf(pdf_path: str):
+    card_blocks = []
+    domain_pattern = re.compile(r'^[A-Z\s]+DOMAIN$')
+    card_pattern = re.compile(r'^(■\s*)?([A-Z][A-Z\s\-]+[A-Z])$')
+    skip_words = {"APPENDIX", "DOMAIN CARD REFERENCE"}
+
+    with open(pdf_path, "rb") as file:
+        reader = PyPDF2.PdfReader(file)
+        for page_num, page in enumerate(reader.pages):
+            text = page.extract_text() or ""
+            lines = text.split('\n')
+            current_domain = None
+            current_card = None
+            current_block = []
+            for line in lines:
+                line_stripped = line.strip()
+                # Detect domain
+                if domain_pattern.match(line_stripped):
+                    current_domain = line_stripped
+                    continue
+                # Detect card/spell name
+                if card_pattern.match(line_stripped) and line_stripped not in skip_words:
+                    # Save previous card
+                    if current_block and current_card:
+                        card_blocks.append({
+                            "domain": current_domain,
+                            "name": current_card,
+                            "page": page_num + 1,
+                            "text": "\n".join(current_block).strip()
+                        })
+                    current_card = card_pattern.match(line_stripped).group(2)
+                    current_block = [line_stripped]
+                else:
+                    if current_block is not None:
+                        current_block.append(line)
+            # Save last card on the page
+            if current_block and current_card:
+                card_blocks.append({
+                    "domain": current_domain,
+                    "name": current_card,
+                    "page": page_num + 1,
+                    "text": "\n".join(current_block).strip()
+                })
+    return card_blocks
 
 # ========== PDF SECTION CHUNKING WITH PAGE TAGS ==========
 def extract_sections_from_pdf(pdf_path: str, headings: list):
-    """
-    Returns a list of (heading_dict, section_text) for each section in the PDF,
-    tagging each with the page number where the heading appears.
-    """
     with open(pdf_path, "rb") as file:
         reader = PyPDF2.PdfReader(file)
-        # Build a map: heading -> (page_num, heading_text)
         heading_pages = {}
         normalized_headings = [h.strip().lower() for h in headings]
         for page_num, page in enumerate(reader.pages):
@@ -49,9 +291,8 @@ def extract_sections_from_pdf(pdf_path: str, headings: list):
                 norm_line = line.strip().lower()
                 if norm_line in normalized_headings:
                     idx = normalized_headings.index(norm_line)
-                    heading_pages[headings[idx]] = page_num + 1  # 1-based page number
+                    heading_pages[headings[idx]] = page_num + 1
 
-        # Now chunk by headings (as before)
         full_text = ""
         for page in reader.pages:
             page_text = page.extract_text()
@@ -80,10 +321,6 @@ def extract_sections_from_pdf(pdf_path: str, headings: list):
 
 # ========== DOCX SECTION CHUNKING ==========
 def extract_sections_from_docx(docx_path: str):
-    """
-    Returns a list of (heading_dict, section_text) for each section in the DOCX,
-    using Heading styles. Page numbers are not available.
-    """
     doc = Document(docx_path)
     sections = []
     current_heading = None
@@ -184,7 +421,7 @@ def extract_section_headings(toc_text):
                 headings.append(heading)
     return headings
 
-# ========== EMBEDDING ========== (replace with your embedding function)
+# ========== EMBEDDING ==========
 def get_embeddings(texts, embedder):
     return embedder.encode(texts, normalize_embeddings=True)
 
@@ -209,11 +446,53 @@ def embedding_generator(
     os.makedirs(os.path.dirname(CHUNKS_PATH), exist_ok=True)
 
     ext = os.path.splitext(FILE_PATH)[1].lower()
+    base = os.path.splitext(os.path.basename(FILE_PATH))[0]
     print(f"Processing file: {FILE_PATH}")
 
     patterns = [r'Daggerheart SRD', r'\bPage \d+\b', r'^\d+$']
 
-    if ext in [".csv", ".xlsx"]:
+    # Special-case for core rules PDF using pdfplumber
+    if base == "core_rules":
+        print("Special font-size-based chunking for core rules PDF ...")
+        raw_chunks = chunk_pdf_with_fontsize(FILE_PATH)
+        chunk_dicts = []
+        for idx, chunk in enumerate(raw_chunks):
+            chunk_dicts.append({
+                "index": idx,
+                "section": chunk["section"],
+                "subsection": chunk["subsection"],
+                "page": chunk["page"],
+                "text": preprocess_text(chunk["text"], patterns)
+            })
+        texts = [c["text"] for c in chunk_dicts]
+
+    # Special-case for adversaries.pdf
+    if base.lower() == "adversaries" or base.lower() == "environments":
+        print("Special stat block chunking for adversaries.pdf ...")
+        stat_blocks = chunk_stat_blocks_from_pdf(FILE_PATH)
+        chunk_dicts = []
+        for idx, block in enumerate(stat_blocks):
+            chunk_dicts.append({
+                "index": idx,
+                "name": block["name"],
+                "page": block["page"],
+                "text": preprocess_text(block["text"], patterns)
+            })
+        texts = [c["text"] for c in chunk_dicts]
+    elif base.lower() == "domain_card_reference":
+        print("Special domain card chunking for domain_card_reference.pdf ...")
+        card_blocks = chunk_domain_cards_from_pdf(FILE_PATH)
+        chunk_dicts = []
+        for idx, block in enumerate(card_blocks):
+            chunk_dicts.append({
+                "index": idx,
+                "domain": block["domain"],
+                "name": block["name"],
+                "page": block["page"],
+                "text": preprocess_text(block["text"], patterns)
+            })
+        texts = [c["text"] for c in chunk_dicts]
+    elif ext in [".csv", ".xlsx"]:
         print("Extracting and chunking table (CSV/XLSX)...")
         raw_sections = extract_chunks_from_table(
             FILE_PATH,
@@ -221,8 +500,14 @@ def embedding_generator(
             filter_dict=filter_dict
         )
         raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
-        sections = raw_sections
-
+        chunk_dicts = []
+        for idx, (headings, text) in enumerate(raw_sections):
+            chunk_dicts.append({
+                "index": idx,
+                "headings": headings,
+                "text": text
+            })
+        texts = [c["text"] for c in chunk_dicts]
     elif ext == ".pdf":
         print("Searching for Table of Contents page...")
         toc_page = TOC_PAGE
@@ -236,71 +521,79 @@ def embedding_generator(
             toc_text = extract_page_text(FILE_PATH, 1)
         headings = extract_section_headings(toc_text)
         print(f"Section headings found in ToC: {headings}")
-        # Extract sections with page tags
         section_chunks = extract_sections_from_pdf(FILE_PATH, headings)
-        # Preprocess after heading assignment
         raw_sections = [(h, preprocess_text(s, patterns)) for h, s in section_chunks]
-        sections = raw_sections
-
+        chunk_dicts = []
+        for idx, (headings, text) in enumerate(raw_sections):
+            chunk_dicts.append({
+                "index": idx,
+                "headings": headings,
+                "text": text
+            })
+        texts = [c["text"] for c in chunk_dicts]
     elif ext == ".docx":
         print("Extracting and chunking DOCX by heading...")
         section_chunks = extract_sections_from_docx(FILE_PATH)
         raw_sections = [(h, preprocess_text(s, patterns)) for h, s in section_chunks]
-        sections = raw_sections
-
+        chunk_dicts = []
+        for idx, (headings, text) in enumerate(raw_sections):
+            chunk_dicts.append({
+                "index": idx,
+                "headings": headings,
+                "text": text
+            })
+        texts = [c["text"] for c in chunk_dicts]
     elif ext == ".txt":
         print("Extracting and chunking TXT...")
         full_text = extract_text_from_txt(FILE_PATH)
-        raw_sections = [(None, preprocess_text(full_text, patterns))]
-        sections = raw_sections
-
+        chunk_dicts = [{
+            "index": 0,
+            "headings": None,
+            "text": preprocess_text(full_text, patterns)
+        }]
+        texts = [chunk_dicts[0]["text"]]
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
-    print(f"Section count after chunking: {len(sections)}")
-    for i, (headings, section) in enumerate(sections):
-        print(f"Section {i}: {len(section) // 4} tokens (approx), Headings: {headings}")
+    print(f"Chunk count: {len(chunk_dicts)}")
+    for i, chunk in enumerate(chunk_dicts):
+        print(f"Chunk {i}: {len(chunk['text']) // 4} tokens (approx), Meta: {chunk.get('headings', chunk.get('name'))}")
 
-    # 3. Prepare chunk dicts for output and embedding
-    chunk_dicts = []
-    for idx, (headings, text) in enumerate(sections):
-        chunk_dicts.append({
-            "index": idx,
-            "headings": headings,
-            "text": text
-        })
-
-    # 4. Generate embeddings in batches
+    # Generate embeddings in batches
     print("Generating embeddings...")
     embeddings = []
     for i in range(0, len(chunk_dicts), BATCH_SIZE):
-        batch = chunk_dicts[i:i+BATCH_SIZE]
-        batch_texts = [c["text"] for c in batch]
+        batch_texts = texts[i:i+BATCH_SIZE]
         batch_embeddings = get_embeddings(batch_texts, embedder)
         embeddings.append(batch_embeddings)
         print(f"Embedded batch {i//BATCH_SIZE + 1}/{(len(chunk_dicts)-1)//BATCH_SIZE + 1}")
     embeddings = np.vstack(embeddings)
 
-    # 5. Save to disk
+    # Save to disk
     print(f"Saving embeddings to {EMBEDDINGS_PATH} ...")
     np.save(EMBEDDINGS_PATH, embeddings)
     print(f"Saving chunks to {CHUNKS_PATH} ...")
     with open(CHUNKS_PATH, "w", encoding="utf-8") as f:
         json.dump(chunk_dicts, f, ensure_ascii=False, indent=2)
 
-    print("Done! You can now load these files in your Flask app.")
+    print("Done! You can now load these files in your search app.")
 
 if __name__ == "__main__":
-    from sentence_transformers import SentenceTransformer
     EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
     embedder = SentenceTransformer(EMBEDDING_MODEL)
 
-    FILE_PATH = "./source/DH-SRD-May202025.pdf"  # or .csv, .pdf, .docx, .txt
-    heading_columns = []  # or any columns you want for CSV/XLSX
-    filter_dict = {}      # or {} for no filter
-    embedding_generator(
-        FILE_PATH,
-        embedder=embedder,
-        heading_columns=heading_columns,
-        filter_dict=filter_dict
-    )
+    # Example: process all files in ./source
+    source_dir = "./source"
+    skip_files = {"DH-SRD-1.0-June-26-2025.pdf"}
+
+    for fname in os.listdir(source_dir):
+        if not fname.lower().endswith((".pdf", ".docx", ".txt", ".csv", ".xlsx")):
+            continue
+        if fname in skip_files:
+            print(f"Skipping {fname}")
+            continue
+        FILE_PATH = os.path.join(source_dir, fname)
+        embedding_generator(
+            FILE_PATH,
+            embedder=embedder
+        )

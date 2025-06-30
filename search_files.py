@@ -109,9 +109,25 @@ def hybrid_search_with_ollama(user_query, k=3, model=OLLAMA_MODEL):
     summary = summarize_with_ollama(top_k, user_query, model=model)
     return summary
 
+def hybrid_search_in_kb(user_query, kb_name, k=3, model=OLLAMA_MODEL):
+    if kb_name not in knowledge_bases:
+        return f"Knowledge base '{kb_name}' not found."
+    kb = knowledge_bases[kb_name]
+    results = search_kb(user_query, kb, embedder, k)
+    if not results:
+        return f"No relevant information found in knowledge base '{kb_name}'."
+    summary = summarize_with_ollama(results[:k], user_query, model=model)
+    return summary
+
 # ========== MAIN ==========
 if __name__ == "__main__":
-    user_query = "What is burden?"
-    answer = hybrid_search_with_ollama(user_query, k=5, model=OLLAMA_MODEL)
-    print("\n--- LLM's answer ---\n")
+    user_query = "How do players generate hope?"
+    #answer = hybrid_search_with_ollama(user_query, k=5, model=OLLAMA_MODEL)
+    #print("\n--- LLM's answer ---\n")
+    #print(answer)
+    #print("\n--- End of answer ---\n")
+    # Example usage for a specific knowledge base
+    kb_name = "core_rules"
+    answer = hybrid_search_in_kb(user_query, kb_name, k=5, model=OLLAMA_MODEL)
+    print(f"\n--- LLM's answer from {kb_name} ---\n")
     print(answer)
