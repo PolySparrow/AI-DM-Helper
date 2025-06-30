@@ -3,17 +3,19 @@ import numpy as np
 import json
 import faiss
 import requests
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, CrossEncoder
+import nltk
+from nltk.corpus import wordnet as wn
 
 # ========== CONFIG ==========
 EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
 EMBEDDINGS_DIR = "./embeddings"
 CHUNKS_DIR = "./chunks"
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"  # or "llama3:70b" for 70B, or "mistral", etc.
+OLLAMA_MODEL = "llama3"
 
-# ========== EMBEDDER ==========
 embedder = SentenceTransformer(EMBEDDING_MODEL)
+reranker = CrossEncoder('cross-encoder/ms-marco-electra-base')
 
 # ========== DYNAMIC LOADING ==========
 def load_all_indexes(embeddings_dir, chunks_dir):
@@ -27,7 +29,7 @@ def load_all_indexes(embeddings_dir, chunks_dir):
                 embeddings = np.load(emb_path)
                 with open(json_path, "r", encoding="utf-8") as f:
                     chunks = json.load(f)
-                index = faiss.IndexFlatIP(embeddings.shape[1])  # Use inner product for normalized embeddings
+                index = faiss.IndexFlatIP(embeddings.shape[1])
                 index.add(embeddings)
                 knowledge_bases[kb_name] = {"index": index, "chunks": chunks}
             else:
@@ -35,6 +37,25 @@ def load_all_indexes(embeddings_dir, chunks_dir):
     return knowledge_bases
 
 knowledge_bases = load_all_indexes(EMBEDDINGS_DIR, CHUNKS_DIR)
+
+# ========== QUERY EXPANSION (DYNAMIC SYNONYMS) ==========
+def expand_query_with_wordnet(query):
+    nltk.download('wordnet', quiet=True)
+    nltk.download('omw-1.4', quiet=True)
+    words = query.split()
+    expanded_queries = set([query])
+    for i, word in enumerate(words):
+        synsets = wn.synsets(word)
+        synonyms = set()
+        for syn in synsets:
+            for lemma in syn.lemmas():
+                synonym = lemma.name().replace('_', ' ')
+                if synonym.lower() != word.lower():
+                    synonyms.add(synonym)
+        for syn in synonyms:
+            new_query = " ".join(words[:i] + [syn] + words[i+1:])
+            expanded_queries.add(new_query)
+    return list(expanded_queries)
 
 # ========== DYNAMIC SEARCH ==========
 def search_kb(query, kb, embedder, k=1):
@@ -56,28 +77,39 @@ def search_kb(query, kb, embedder, k=1):
             "score": float(distances[0][rank]),
             "formatted": f"{heading_str}{chunk['text']}"
         })
-    print(f"Search results for '{query}' in {kb['index'].ntotal} items: {len(results)} found.")
     return results
 
+# ========== RERANKING ==========
+def rerank(query, results, top_n=3):
+    pairs = [(query, r['text']) for r in results]
+    scores = reranker.predict(pairs)
+    reranked = sorted(zip(results, scores), key=lambda x: -x[1])
+    return reranked[:top_n]  # List of (result, score) tuples
+
 # ========== PROMPT FORMATTING ==========
-def format_prompt(results, user_query, chunk_char_limit=None):
+def format_prompt(results, user_query, chunk_char_limit=None, low_confidence_msg=""):
     prompt = "You are an expert RPG assistant.\n"
-    for idx, result in enumerate(results, 1):
+    if low_confidence_msg:
+        prompt += low_confidence_msg + "\n"
+    for idx, (result, score) in enumerate(results, 1):
         section = ""
         if result.get("headings"):
             section = "Section: " + " | ".join(f"{k}: {v}" for k, v in result["headings"].items() if v)
-        chunk_text = result['text'][:chunk_char_limit]
-        prompt += f"{idx}. [{section}]\n{chunk_text}\n\n"
+        chunk_text = result['text'][:chunk_char_limit] if chunk_char_limit else result['text']
+        prompt += (
+            f"{idx}. [Score: {score:.4f}] [{section}]\n"
+            f"{chunk_text}\n\n"
+        )
     prompt += (
         f'User\'s question: "{user_query}"\n\n'
         "Please answer the user's question using the information above. "
-        "Summarize or explain as needed, and cite the section(s) you used."
+        "Summarize or explain as needed, and cite the section(s) and confidence score(s) you used."
     )
     return prompt
 
-# ========== OLLAMA SUMMARIZATION ==========
-def summarize_with_ollama(results, user_query, model=OLLAMA_MODEL):
-    prompt = format_prompt(results, user_query)
+# ========== SUMMARIZATION WITH OLLAMA ==========
+def summarize_with_ollama(reranked_results, user_query, model=OLLAMA_MODEL, low_confidence_msg=""):
+    prompt = format_prompt(reranked_results, user_query, low_confidence_msg=low_confidence_msg)
     print("\n--- Prompt sent to Ollama ---\n")
     print(prompt)
     print("\n--- End of prompt ---\n")
@@ -87,47 +119,66 @@ def summarize_with_ollama(results, user_query, model=OLLAMA_MODEL):
     )
     return response.json()["response"]
 
-# ========== HYBRID SEARCH + SUMMARIZATION ==========
-def hybrid_search_with_ollama(user_query, k=3, model=OLLAMA_MODEL):
-    kb_results = {}
-    for kb_name, kb in knowledge_bases.items():
-        kb_results[kb_name] = search_kb(user_query, kb, embedder, k)
-
-    # Collect all results, flatten, and sort by score (higher is better for cosine similarity)
+# ========== HYBRID SEARCH: QUERY EXPANSION + RERANKING ==========
+def hybrid_search_in_kbs_with_expansion_and_rerank(
+    user_query, 
+    kb_names, 
+    k=3, 
+    model=OLLAMA_MODEL,
+    confidence_threshold=0.5
+):
+    if isinstance(kb_names, str):
+        kb_names = [kb_names]
     all_results = []
-    for kb_name, results in kb_results.items():
-        for result in results:
-            result_copy = result.copy()
-            result_copy["kb_name"] = kb_name
-            all_results.append(result_copy)
-    all_results.sort(key=lambda r: -r["score"])  # Sort descending
-
-    if not all_results:
-        return "No relevant information found in any knowledge base."
-
-    top_k = all_results[:k]
-    summary = summarize_with_ollama(top_k, user_query, model=model)
-    return summary
-
-def hybrid_search_in_kb(user_query, kb_name, k=3, model=OLLAMA_MODEL):
-    if kb_name not in knowledge_bases:
-        return f"Knowledge base '{kb_name}' not found."
-    kb = knowledge_bases[kb_name]
-    results = search_kb(user_query, kb, embedder, k)
-    if not results:
-        return f"No relevant information found in knowledge base '{kb_name}'."
-    summary = summarize_with_ollama(results[:k], user_query, model=model)
-    return summary
+    expanded_queries = expand_query_with_wordnet(user_query)
+    for kb_name in kb_names:
+        if kb_name not in knowledge_bases:
+            print(f"Knowledge base '{kb_name}' not found. Skipping.")
+            continue
+        kb = knowledge_bases[kb_name]
+        for q in expanded_queries:
+            results = search_kb(q, kb, embedder, k=10)
+            for r in results:
+                r_copy = r.copy()
+                r_copy["kb_name"] = kb_name
+                all_results.append(r_copy)
+    # Deduplicate by text
+    seen = set()
+    unique_results = []
+    for r in all_results:
+        if r["text"] not in seen:
+            unique_results.append(r)
+            seen.add(r["text"])
+    # Rerank and get scores
+    reranked_results = rerank(user_query, unique_results, top_n=k)
+    # Print confidence scores and chunk info
+    print("\nTop reranked results with confidence scores:")
+    for idx, (result, score) in enumerate(reranked_results, 1):
+        print(f"{idx}. [Score: {score:.4f}] KB: {result.get('kb_name', '')} | Section: {result.get('headings', '')}")
+        print(f"   {result['text'][:200]}...\n")
+    # Check top score
+    top_score = reranked_results[0][1] if reranked_results else 0
+    low_confidence_msg = ""
+    if top_score < confidence_threshold:
+        low_confidence_msg = (
+            "\nWARNING: The confidence score for the best match is low. "
+            "Please try to be more specific in your question.\n"
+        )
+        print(low_confidence_msg)
+    # Summarize with Ollama, passing both result and score, and add warning to prompt
+    summary = summarize_with_ollama(reranked_results, user_query, model=model, low_confidence_msg=low_confidence_msg)
+    # Print the warning with the answer as well
+    if low_confidence_msg:
+        return low_confidence_msg + summary
+    else:
+        return summary
 
 # ========== MAIN ==========
+
 if __name__ == "__main__":
-    user_query = "How do players generate hope?"
-    #answer = hybrid_search_with_ollama(user_query, k=5, model=OLLAMA_MODEL)
-    #print("\n--- LLM's answer ---\n")
-    #print(answer)
-    #print("\n--- End of answer ---\n")
-    # Example usage for a specific knowledge base
-    kb_name = "core_rules"
-    answer = hybrid_search_in_kb(user_query, kb_name, k=5, model=OLLAMA_MODEL)
-    print(f"\n--- LLM's answer from {kb_name} ---\n")
+    user_query = "when rolling dice, How do players gain hope?"
+    kb_name = ["core_rules"]
+
+    print("\n--- Query Expansion + Reranking Example ---\n")
+    answer = hybrid_search_in_kbs_with_expansion_and_rerank(user_query, kb_name, k=5, model=OLLAMA_MODEL)
     print(answer)
