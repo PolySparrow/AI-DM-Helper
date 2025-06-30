@@ -4,6 +4,8 @@ import json
 import faiss
 import openai
 import config
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # ========== CONFIG ==========
 OPENAI_API_KEY = config.openai_apikey
@@ -63,8 +65,7 @@ def search_kb(query, kb, k=1):
     print (f"Search results for '{query}' in {kb['index'].ntotal} items: {len(results)} found.")
     return results
 
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+
 
 # ---- 1. Choose and Load a Model ----
 # For best results, use a model with "Instruct" or "Chat" in the name.
@@ -74,12 +75,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 # model_name = "mistralai/Mistral-7B-Instruct-v0.2"
 
 # Example: TinyLlama (works on CPU, less capable)
-model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model = model.to(device)
 
 # ---- 2. Format the Prompt ----
 def format_prompt(results, user_query):
@@ -139,7 +135,13 @@ def hybrid_search_with_hf(user_query, k=5, model=None, tokenizer=None):
 
 # ---- 5. Example Usage ----
 if __name__ == "__main__":
+    model_name = "google/gemma-2b-it"
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForCausalLM.from_pretrained(model_name)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = model.to(device)
     user_query = "How does hope work?"
     # You must define knowledge_bases and search_kb before this!
-    answer = hybrid_search_with_hf(user_query, k=5, model=model, tokenizer=tokenizer)
+    answer = hybrid_search_with_hf(user_query, k=2, model=model, tokenizer=tokenizer)
     print(answer)
