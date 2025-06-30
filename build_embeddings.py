@@ -10,8 +10,14 @@ from typing import Optional
 import PyPDF2
 from docx import Document
 import openpyxl
-import openai
-import config
+
+def extract_page_text(pdf_path: str, page_number: int) -> str:
+    with open(pdf_path, "rb") as file:
+        reader = PyPDF2.PdfReader(file)
+        if 0 <= page_number < len(reader.pages):
+            return reader.pages[page_number].extract_text() or ""
+        else:
+            return ""
 
 # ========== PREPROCESSING ==========
 def preprocess_text(text, remove_patterns=None):
@@ -25,34 +31,58 @@ def preprocess_text(text, remove_patterns=None):
     text = text.replace('“', '"').replace('”', '"').replace('’', "'").replace('–', '-')
     return text
 
-# ========== FILE EXTRACTION ==========
-def extract_text_from_pdf(pdf_path: str) -> str:
-    text = ""
+# ========== PDF SECTION CHUNKING WITH PAGE TAGS ==========
+def extract_sections_from_pdf(pdf_path: str, headings: list):
+    """
+    Returns a list of (heading_dict, section_text) for each section in the PDF,
+    tagging each with the page number where the heading appears.
+    """
     with open(pdf_path, "rb") as file:
         reader = PyPDF2.PdfReader(file)
+        # Build a map: heading -> (page_num, heading_text)
+        heading_pages = {}
+        normalized_headings = [h.strip().lower() for h in headings]
+        for page_num, page in enumerate(reader.pages):
+            text = page.extract_text() or ""
+            lines = text.split('\n')
+            for line in lines:
+                norm_line = line.strip().lower()
+                if norm_line in normalized_headings:
+                    idx = normalized_headings.index(norm_line)
+                    heading_pages[headings[idx]] = page_num + 1  # 1-based page number
+
+        # Now chunk by headings (as before)
+        full_text = ""
         for page in reader.pages:
             page_text = page.extract_text()
             if page_text:
-                text += page_text + "\n"
-    return text
+                full_text += page_text + "\n"
 
-def extract_page_text(pdf_path: str, page_number: int) -> str:
-    with open(pdf_path, "rb") as file:
-        reader = PyPDF2.PdfReader(file)
-        if 0 <= page_number < len(reader.pages):
-            return reader.pages[page_number].extract_text() or ""
-        else:
-            return ""
-
-def extract_text_from_txt(txt_path: str) -> str:
-    with open(txt_path, 'r', encoding='utf-8') as file:
-        return file.read()
+        sections = []
+        normalized_headings = [h.strip().lower() for h in headings]
+        lines = full_text.split('\n')
+        current_section = []
+        current_title = None
+        for line in lines:
+            norm_line = line.strip().lower()
+            if norm_line in normalized_headings:
+                if current_section and current_title:
+                    page_num = heading_pages.get(current_title, None)
+                    sections.append(({"Section": current_title, "Page": page_num}, "\n".join(current_section).strip()))
+                current_title = line.strip()
+                current_section = []
+            else:
+                current_section.append(line)
+        if current_section and current_title:
+            page_num = heading_pages.get(current_title, None)
+            sections.append(({"Section": current_title, "Page": page_num}, "\n".join(current_section).strip()))
+        return sections
 
 # ========== DOCX SECTION CHUNKING ==========
 def extract_sections_from_docx(docx_path: str):
     """
     Returns a list of (heading_dict, section_text) for each section in the DOCX,
-    using Heading styles.
+    using Heading styles. Page numbers are not available.
     """
     doc = Document(docx_path)
     sections = []
@@ -141,13 +171,6 @@ def find_toc_page(pdf_path, max_search_pages=10):
                     return i
     return None
 
-# ========== CHUNKING & SPLITTING ==========
-def split_into_paragraphs(text):
-    return [p.strip() for p in re.split(r'\n\s*\n', text) if p.strip()]
-
-def split_into_sentences(text):
-    return re.split(r'(?<=[.!?])\s+', text)
-
 def extract_section_headings(toc_text):
     headings = []
     for line in toc_text.split('\n'):
@@ -161,115 +184,9 @@ def extract_section_headings(toc_text):
                 headings.append(heading)
     return headings
 
-def chunk_by_paragraph(text):
-    return [p.strip() for p in re.split(r'\n\s*\n', text) if p.strip()]
-
-def chunk_by_headings(text, headings):
-    """
-    Splits text into sections by headings.
-    Returns a list of (heading_dict, section_text).
-    """
-    normalized_headings = [h.strip().lower() for h in headings]
-    lines = text.split('\n')
-    sections = []
-    current_section = []
-    current_title = None
-
-    for line in lines:
-        normalized_line = line.strip().lower()
-        if normalized_line in normalized_headings:
-            if current_section and current_title:
-                sections.append(({"Section": current_title}, "\n".join(current_section).strip()))
-            current_title = line.strip()
-            current_section = []
-        else:
-            current_section.append(line)
-    if current_section and current_title:
-        sections.append(({"Section": current_title}, "\n".join(current_section).strip()))
-    return sections
-
-def chunk_sections_to_paragraphs(sections):
-    """
-    Given a list of (heading_dict, section_text), split each section into paragraphs,
-    assigning the heading to each paragraph.
-    Returns a list of (heading_dict, paragraph) tuples.
-    """
-    result = []
-    for heading_dict, section_text in sections:
-        paragraphs = split_into_paragraphs(section_text)
-        for para in paragraphs:
-            if para.strip():
-                result.append((heading_dict, para.strip()))
-    return result
-
-def re_chunk_sections(sections, max_tokens=8191):
-    max_chars = max_tokens * 4
-    new_sections = []
-    for headings, section in sections:
-        if len(section) <= max_chars:
-            new_sections.append((headings, section))
-        else:
-            paragraphs = split_into_paragraphs(section)
-            chunk = ""
-            for para in paragraphs:
-                if len(chunk) + len(para) + 2 <= max_chars:
-                    chunk += para + "\n\n"
-                else:
-                    if chunk:
-                        new_sections.append((headings, chunk.strip()))
-                    if len(para) > max_chars:
-                        sentences = split_into_sentences(para)
-                        sent_chunk = ""
-                        for sent in sentences:
-                            if len(sent_chunk) + len(sent) + 1 <= max_chars:
-                                sent_chunk += sent + " "
-                            else:
-                                new_sections.append((headings, sent_chunk.strip()))
-                                sent_chunk = sent + " "
-                        if sent_chunk:
-                            new_sections.append((headings, sent_chunk.strip()))
-                    else:
-                        new_sections.append((headings, para.strip()))
-                    chunk = ""
-            if chunk:
-                new_sections.append((headings, chunk.strip()))
-    return new_sections
-
-def re_chunk_paragraphs(paragraphs, max_tokens=8191):
-    max_chars = max_tokens * 4
-    new_sections = []
-    chunk = ""
-    for para in paragraphs:
-        if len(chunk) + len(para) + 2 <= max_chars:
-            chunk += para + "\n\n"
-        else:
-            if chunk:
-                new_sections.append((None, chunk.strip()))
-            if len(para) > max_chars:
-                sentences = split_into_sentences(para)
-                sent_chunk = ""
-                for sent in sentences:
-                    if len(sent_chunk) + len(sent) + 1 <= max_chars:
-                        sent_chunk += sent + " "
-                    else:
-                        new_sections.append((None, sent_chunk.strip()))
-                        sent_chunk = sent + " "
-                if sent_chunk:
-                    new_sections.append((None, sent_chunk.strip()))
-            else:
-                new_sections.append((None, para.strip()))
-            chunk = ""
-    if chunk:
-        new_sections.append((None, chunk.strip()))
-    return new_sections
-
-# ========== EMBEDDING ==========
-def get_embeddings(texts, client, model="text-embedding-3-small"):
-    response = client.embeddings.create(
-        input=texts,
-        model=model
-    )
-    return np.array([d.embedding for d in response.data], dtype="float32")
+# ========== EMBEDDING ========== (replace with your embedding function)
+def get_embeddings(texts, embedder):
+    return embedder.encode(texts, normalize_embeddings=True)
 
 # ========== OUTPUT PATHS ==========
 def get_output_paths(source_path, embeddings_dir="./embeddings", chunks_dir="./chunks"):
@@ -281,6 +198,7 @@ def get_output_paths(source_path, embeddings_dir="./embeddings", chunks_dir="./c
 # ========== MAIN WORKFLOW ==========
 def embedding_generator(
     FILE_PATH,
+    embedder,
     BATCH_SIZE=20,
     TOC_PAGE=None,
     heading_columns=None,
@@ -318,29 +236,23 @@ def embedding_generator(
             toc_text = extract_page_text(FILE_PATH, 1)
         headings = extract_section_headings(toc_text)
         print(f"Section headings found in ToC: {headings}")
-        full_text = extract_text_from_pdf(FILE_PATH)
-        # Chunk by section heading
-        section_chunks = chunk_by_headings(full_text, headings)
-        # Now split each section into paragraphs, assigning the heading
-        raw_sections = chunk_sections_to_paragraphs(section_chunks)
+        # Extract sections with page tags
+        section_chunks = extract_sections_from_pdf(FILE_PATH, headings)
         # Preprocess after heading assignment
-        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
-        sections = re_chunk_sections(raw_sections, max_tokens=7000)
+        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in section_chunks]
+        sections = raw_sections
 
     elif ext == ".docx":
         print("Extracting and chunking DOCX by heading...")
         section_chunks = extract_sections_from_docx(FILE_PATH)
-        raw_sections = chunk_sections_to_paragraphs(section_chunks)
-        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
-        sections = re_chunk_sections(raw_sections, max_tokens=7000)
+        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in section_chunks]
+        sections = raw_sections
 
     elif ext == ".txt":
         print("Extracting and chunking TXT...")
         full_text = extract_text_from_txt(FILE_PATH)
-        paragraphs = chunk_by_paragraph(full_text)
-        raw_sections = [(None, p) for p in paragraphs]
-        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
-        sections = re_chunk_sections(raw_sections, max_tokens=7000)
+        raw_sections = [(None, preprocess_text(full_text, patterns))]
+        sections = raw_sections
 
     else:
         raise ValueError(f"Unsupported file type: {ext}")
@@ -360,12 +272,11 @@ def embedding_generator(
 
     # 4. Generate embeddings in batches
     print("Generating embeddings...")
-    openai_client = openai.OpenAI(api_key=config.openai_apikey)
     embeddings = []
     for i in range(0, len(chunk_dicts), BATCH_SIZE):
         batch = chunk_dicts[i:i+BATCH_SIZE]
         batch_texts = [c["text"] for c in batch]
-        batch_embeddings = get_embeddings(batch_texts, openai_client)
+        batch_embeddings = get_embeddings(batch_texts, embedder)
         embeddings.append(batch_embeddings)
         print(f"Embedded batch {i//BATCH_SIZE + 1}/{(len(chunk_dicts)-1)//BATCH_SIZE + 1}")
     embeddings = np.vstack(embeddings)
@@ -380,12 +291,16 @@ def embedding_generator(
     print("Done! You can now load these files in your Flask app.")
 
 if __name__ == "__main__":
-    # Example usage for CSV/XLSX:
+    from sentence_transformers import SentenceTransformer
+    EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
+    embedder = SentenceTransformer(EMBEDDING_MODEL)
+
     FILE_PATH = "./source/DH-SRD-May202025.pdf"  # or .csv, .pdf, .docx, .txt
     heading_columns = []  # or any columns you want for CSV/XLSX
     filter_dict = {}      # or {} for no filter
     embedding_generator(
         FILE_PATH,
+        embedder=embedder,
         heading_columns=heading_columns,
         filter_dict=filter_dict
     )
