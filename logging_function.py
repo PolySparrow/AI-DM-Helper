@@ -3,7 +3,7 @@ def setup_logger(
     name='gelatinous_cube',
     log_file='AI_DM.log',
     mode_type='a',
-    level=logging.INFO
+    level=logging.DEBUG
 ):
     """Function to setup a logger with a single file handler."""
     logger = logging.getLogger(name)

@@ -2,8 +2,8 @@ import subprocess
 import logging_function
 import nltk
 
-nltk.download('wordnet')
-nltk.download('omw-1.4')
+#nltk.download('wordnet')
+#nltk.download('omw-1.4')
 
 if __name__ == '__main__':
     logger= logging_function.setup_logger()
@@ -11,5 +11,5 @@ if __name__ == '__main__':
 
     logger.info("Starting the Dungeon Master API and Flask app...")
     # Start the Flask app and Dungeon Master API
-    subprocess.Popen(['python', 'app.py'])
+    subprocess.Popen(['python', 'chatbox_server.py'])
     subprocess.Popen(['python', 'dungeon_master_api.py'])

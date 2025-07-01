@@ -6,6 +6,11 @@ import requests
 from sentence_transformers import SentenceTransformer, CrossEncoder
 import nltk
 from nltk.corpus import wordnet as wn
+import dungeon_master_functions as dm_functions
+import logging_function
+
+# Setup logger
+logger = logging_function.setup_logger()
 
 # ========== CONFIG ==========
 EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
@@ -87,7 +92,7 @@ def rerank(query, results, top_n=3):
     return reranked[:top_n]  # List of (result, score) tuples
 
 # ========== PROMPT FORMATTING ==========
-def format_prompt(results, user_query, chunk_char_limit=None, low_confidence_msg=""):
+def format_prompt(results, user_query, chunk_char_limit=None, low_confidence_msg="", history=None):
     prompt = "You are an expert RPG assistant.\n"
     if low_confidence_msg:
         prompt += low_confidence_msg + "\n"
@@ -100,16 +105,25 @@ def format_prompt(results, user_query, chunk_char_limit=None, low_confidence_msg
             f"{idx}. [Score: {score:.4f}] [{section}]\n"
             f"{chunk_text}\n\n"
         )
+    # Add chat history as context if provided
+    if history:
+        prompt += "\nConversation so far:\n"
+        role_map = {"system": "System", "user": "User", "assistant": "Assistant"}
+        for msg in history:
+            role = role_map.get(msg["role"], msg["role"].capitalize())
+            content = msg["content"]
+            prompt += f"{role}: {content}\n"
     prompt += (
         f'User\'s question: "{user_query}"\n\n'
         "Please answer the user's question using the information above. "
         "Summarize or explain as needed, and cite the section(s) and confidence score(s) you used."
     )
+    logger.debug("Formatted prompt for Ollama:\n" + prompt)
     return prompt
 
 # ========== SUMMARIZATION WITH OLLAMA ==========
-def summarize_with_ollama(reranked_results, user_query, model=OLLAMA_MODEL, low_confidence_msg=""):
-    prompt = format_prompt(reranked_results, user_query, low_confidence_msg=low_confidence_msg)
+def summarize_with_ollama(reranked_results, user_query, model=OLLAMA_MODEL, low_confidence_msg="", history=None):
+    prompt = format_prompt(reranked_results, user_query, low_confidence_msg=low_confidence_msg, history=history)
     print("\n--- Prompt sent to Ollama ---\n")
     print(prompt)
     print("\n--- End of prompt ---\n")
@@ -121,12 +135,9 @@ def summarize_with_ollama(reranked_results, user_query, model=OLLAMA_MODEL, low_
 
 # ========== HYBRID SEARCH: QUERY EXPANSION + RERANKING ==========
 def hybrid_search_in_kbs_with_expansion_and_rerank(
-    user_query, 
-    kb_names, 
-    k=3, 
-    model=OLLAMA_MODEL,
-    confidence_threshold=0.5
+    user_query, kb_names, history=None, k=3, model=OLLAMA_MODEL, confidence_threshold=0.5
 ):
+    print("I'm a stinky butthole")
     if isinstance(kb_names, str):
         kb_names = [kb_names]
     all_results = []
@@ -165,18 +176,22 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
             "Please try to be more specific in your question.\n"
         )
         print(low_confidence_msg)
+    logger.info(f"Top score: {top_score:.4f} (threshold: {confidence_threshold})")
+    logger.debug(f"Reranked results: {reranked_results}")
     # Summarize with Ollama, passing both result and score, and add warning to prompt
-    summary = summarize_with_ollama(reranked_results, user_query, model=model, low_confidence_msg=low_confidence_msg)
-    # Print the warning with the answer as well
+    summary = summarize_with_ollama(
+        reranked_results, user_query, model=model, low_confidence_msg=low_confidence_msg, history=history
+    )
     if low_confidence_msg:
-        return low_confidence_msg + summary
+        return low_confidence_msg + summary, list(kb_names)
     else:
-        return summary
+        return summary, list(kb_names)
 
 # ========== MAIN ==========
 
 if __name__ == "__main__":
-    user_query = "when rolling dice, How do players gain hope?"
+    logger = logging_function.setup_logger()
+    user_query = "When does the DM Generate Fear?"
     kb_name = ["core_rules"]
 
     print("\n--- Query Expansion + Reranking Example ---\n")

@@ -41,6 +41,27 @@
     .aidm-footer { color: #8B0000; font-size: 0.95em; margin-top: 1em; }
     code { background: #f8f0f0; color: #8B0000; border-radius: 4px; padding: 2px 4px; }
     pre { background: #fff5f5; border-radius: 8px; padding: 0.75em; margin: 0.5em 0; font-size: 1em; overflow-x: auto; }
+    .spinner-border { width: 1.5rem; height: 1.5rem; }
+    .kb-desc-icon {
+      color: #8B0000;
+      cursor: pointer;
+      margin-left: 0.25em;
+      font-size: 1em;
+      vertical-align: middle;
+    }
+    .kb-desc-tooltip {
+      display: none;
+      position: absolute;
+      background: #fff;
+      border: 1px solid #8B0000;
+      color: #8B0000;
+      border-radius: 8px;
+      padding: 0.5em;
+      z-index: 1000;
+      max-width: 250px;
+      font-size: 0.95em;
+      box-shadow: 0 2px 8px rgba(139,0,0,0.08);
+    }
     @media (max-width: 600px) {
       .container { padding: 0 0.5em !important; }
       .aidm-header, .chat-box { border-radius: 0; }
@@ -51,6 +72,23 @@
 <div class="container py-4" style="max-width: 100%; max-width: 800px;">
   <div class="aidm-header">
     AI DM Helper Smart Chat
+  </div>
+  <!-- Clear Chat Button -->
+  <div class="d-flex justify-content-end mb-2">
+    <button type="button" class="btn btn-sm btn-outline-danger" id="clearChatBtn">
+      Clear Chat
+    </button>
+  </div>
+  <!-- Knowledge Base Selector -->
+  <div class="mb-3" id="kbSelector">
+    <label class="form-label"><b>Knowledge Bases:</b></label>
+    <div id="kbCheckboxes" class="mb-2 position-relative"></div>
+    <button type="button" class="btn btn-sm btn-outline-secondary me-1" id="selectAllBtn">Select All</button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllBtn">Deselect All</button>
+    <span id="kbLoading" class="ms-2" style="display:none;">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      Loading...
+    </span>
   </div>
   <div class="chat-box" id="chatBox"></div>
   <form id="chatForm" class="d-flex">
@@ -65,11 +103,15 @@
   </div>
 </div>
 <!-- Prism.js for syntax highlighting -->
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.js"></script>
 <script>
   let chatHistory = [
     { role: "system", content: "You are a helpful assistant." }
   ];
+  let selectedKBs = [];
+  let kbList = [];
 
+  // Escape HTML for safe rendering
   function escapeHtml(text) {
     return text.replace(/[&<>"']/g, function(m) {
       return ({
@@ -78,7 +120,103 @@
     });
   }
 
-  // Removed renderBotMessage. Bot messages will be rendered as plain text with line breaks.
+  // Tooltip logic for KB descriptions
+  function showTooltip(e, desc) {
+    let tooltip = document.getElementById('kb-desc-tooltip');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.id = 'kb-desc-tooltip';
+      tooltip.className = 'kb-desc-tooltip';
+      document.body.appendChild(tooltip);
+    }
+    tooltip.innerText = desc;
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.pageX + 10) + 'px';
+    tooltip.style.top = (e.pageY + 10) + 'px';
+  }
+  function hideTooltip() {
+    let tooltip = document.getElementById('kb-desc-tooltip');
+    if (tooltip) tooltip.style.display = 'none';
+  }
+
+  // Load knowledge bases from backend and render checkboxes
+  async function loadKnowledgeBases() {
+    document.getElementById('kbLoading').style.display = '';
+    try {
+      const res = await fetch('http://localhost:5000/knowledge_bases');
+      const data = await res.json();
+      kbList = data.knowledge_bases || [];
+      const kbCheckboxes = document.getElementById('kbCheckboxes');
+      kbCheckboxes.innerHTML = '';
+      // Load previous selection from localStorage, or select all by default
+      let saved = localStorage.getItem('selectedKBs');
+      if (saved) {
+        try { selectedKBs = JSON.parse(saved); } catch { selectedKBs = kbList.map(kb => kb.name); }
+      } else {
+        selectedKBs = kbList.map(kb => kb.name);
+      }
+      kbList.forEach(kb => {
+        const id = `kb_${kb.name}`;
+        const checked = selectedKBs.includes(kb.name) ? 'checked' : '';
+        kbCheckboxes.innerHTML += `
+          <div class="form-check form-check-inline position-relative" style="margin-bottom:0.5em;">
+            <input class="form-check-input" type="checkbox" id="${id}" value="${kb.name}" ${checked}>
+            <label class="form-check-label" for="${id}">${kb.name}</label>
+            ${kb.description ? `<span class="kb-desc-icon" tabindex="0" title="Show description"
+              onmouseover="showTooltip(event, '${escapeHtml(kb.description)}')"
+              onmouseout="hideTooltip()"
+              onfocus="showTooltip(event, '${escapeHtml(kb.description)}')"
+              onblur="hideTooltip()"
+              >&#9432;</span>` : ''}
+          </div>
+        `;
+      });
+      // Add event listeners for checkboxes
+      kbCheckboxes.querySelectorAll('input[type=checkbox]').forEach(cb => {
+        cb.addEventListener('change', function() {
+          if (this.checked) {
+            if (!selectedKBs.includes(this.value)) selectedKBs.push(this.value);
+          } else {
+            selectedKBs = selectedKBs.filter(kb => kb !== this.value);
+          }
+          localStorage.setItem('selectedKBs', JSON.stringify(selectedKBs));
+        });
+      });
+    } catch (err) {
+      document.getElementById('kbCheckboxes').innerHTML = '<span class="text-danger">Failed to load knowledge bases.</span>';
+    }
+    document.getElementById('kbLoading').style.display = 'none';
+  }
+
+  // Select all KBs
+  document.getElementById('selectAllBtn').onclick = function() {
+    selectedKBs = kbList.map(kb => kb.name);
+    document.querySelectorAll('#kbCheckboxes input[type=checkbox]').forEach(cb => {
+      cb.checked = true;
+    });
+    localStorage.setItem('selectedKBs', JSON.stringify(selectedKBs));
+  };
+  // Deselect all KBs
+  document.getElementById('deselectAllBtn').onclick = function() {
+    selectedKBs = [];
+    document.querySelectorAll('#kbCheckboxes input[type=checkbox]').forEach(cb => {
+      cb.checked = false;
+    });
+    localStorage.setItem('selectedKBs', JSON.stringify(selectedKBs));
+  };
+
+  // Clear Chat Button handler
+  document.getElementById('clearChatBtn').onclick = function() {
+    chatHistory = [
+      { role: "system", content: "You are a helpful assistant." }
+    ];
+    document.getElementById('chatBox').innerHTML = '';
+  };
+
+  // Initial load of KBs
+  loadKnowledgeBases();
+
+  // Chat form handler
   const chatBox = document.getElementById('chatBox');
   document.getElementById('chatForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -87,21 +225,32 @@
     if (!msg) return;
     chatHistory.push({ role: "user", content: msg });
     chatBox.innerHTML += `<div class="msg user-msg"><b>You:</b> ${escapeHtml(msg)}</div>`;
-    chatBox.innerHTML += `<div class="msg bot-msg" id="botTyping">Bot is typing...</div>`;
+    chatBox.innerHTML += `<div class="msg bot-msg" id="botTyping"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Bot is typing...</div>`;
     chatBox.scrollTop = chatBox.scrollHeight;
     input.value = '';
     try {
+      // If no KBs selected, show error and abort
+      if (selectedKBs.length === 0) {
+        document.getElementById('botTyping').remove();
+        chatBox.innerHTML += `<div class="msg bot-msg"><b>Bot:</b> Please select at least one knowledge base.</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return;
+      }
       const res = await fetch('http://localhost:5000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history: chatHistory })
+        body: JSON.stringify({
+          history: chatHistory,
+          knowledge_bases: selectedKBs
+        })
       });
       const data = await res.json();
       document.getElementById('botTyping').remove();
       if (data.success) {
         chatHistory.push({ role: "assistant", content: data.response });
-        // Just render as plain text with line breaks
-        chatBox.innerHTML += `<div class="msg bot-msg"><b>Bot:</b> <span>${escapeHtml(data.response).replace(/\n/g, "<br>")}</span></div>`;
+        let usedKBs = data.used_kbs || selectedKBs;
+        let usedKBsStr = usedKBs.length ? `<div class="small text-muted">Used KBs: ${usedKBs.map(kb => `<code>${escapeHtml(kb)}</code>`).join(', ')}</div>` : '';
+        chatBox.innerHTML += `<div class="msg bot-msg"><b>Bot:</b> <span>${escapeHtml(data.response).replace(/\n/g, "<br>")}</span>${usedKBsStr}</div>`;
         Prism.highlightAll();
       } else {
         chatBox.innerHTML += `<div class="msg bot-msg"><b>Bot:</b> Error: ${escapeHtml(data.error)}</div>`;
@@ -112,6 +261,10 @@
       chatBox.innerHTML += `<div class="msg bot-msg"><b>Bot:</b> Request failed: ${escapeHtml(err.toString())}</div>`;
     }
   });
+
+  // Tooltip global handlers
+  window.showTooltip = showTooltip;
+  window.hideTooltip = hideTooltip;
 </script>
 </body>
 </html>

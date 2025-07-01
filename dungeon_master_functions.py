@@ -1,35 +1,33 @@
 import openai
 import logging
-import config
+#import config
 import random
 import json
 import random
-
-def CreateOpenAIClient(openai_apikey=config.openai_apikey):
-    """Create and return an OpenAI client."""
-    return openai.OpenAI(openai_apikey)
-
-def Chat(prompt):
-    AI=CreateOpenAIClient()
-    """Send a prompt to the OpenAI API and return the response."""
-    try:
-        response = AI.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=1500,
-            temperature=0.7
-        )
-        message=response.choices[0].message.content.strip()
-        AI.close()
-        return message
-    except Exception as e:
-        logging.error(f"Error in Chat function: {e}")
-        return str(e)
+import logging_function
+logger = logging_function.setup_logger()
 
 
+def format_history_for_llama(history):
+    role_map = {
+        "system": "System",
+        "user": "User",
+        "assistant": "Assistant"
+    }
+    prompt = ""
+    for msg in history:
+        role = role_map.get(msg["role"], msg["role"].capitalize())
+        content = msg["content"]
+        prompt += f"{role}: {content}\n"
+    prompt += "Assistant: "
+    logger.debug("Formatted prompt for Llama:\n" + prompt)
+    return prompt
+
+def get_latest_user_message(history):
+    for msg in reversed(history):
+        if msg.get("role") == "user":
+            return msg.get("content", "")
+    return ""
 
 def roll_labeled_dice_text_from_json(json_input):
     """
@@ -64,12 +62,12 @@ def roll_labeled_dice_text_from_json(json_input):
     return "\n".join(lines)
 
 # Example usage:
-json_input = '''
-[
-    {"qty": 2, "sides": 12, "labels": ["hope", "fear"]},
-    {"qty": 1, "sides": 6}
-]
-'''
+# json_input = '''
+# [
+#     {"qty": 2, "sides": 12, "labels": ["hope", "fear"]},
+#     {"qty": 1, "sides": 6}
+# ]
+# '''
 
-result_text = roll_labeled_dice_text_from_json(json_input)
-print(result_text)
+# result_text = roll_labeled_dice_text_from_json(json_input)
+# print(result_text)
