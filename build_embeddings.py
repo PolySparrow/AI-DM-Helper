@@ -32,76 +32,7 @@ def read_headings_csv(csv_path):
             headings.append(row)
     return headings
 
-def get_page_texts_from_pdf(pdf_path, start_page, end_page):
-    texts = []
-    with pdfplumber.open(pdf_path) as pdf:
-        for page_num in range(int(start_page)-1, int(end_page)):
-            if 0 <= page_num < len(pdf.pages):
-                page = pdf.pages[page_num]
-                page_text = page.extract_text()
-                if page_text:
-                    texts.append(page_text)
-    return "\n".join(texts)
 
-def chunk_by_headings(full_text, headings):
-    # Build a list of (heading, index) for all headings found in the text
-    lines = full_text.split('\n')
-    heading_indices = []
-    for row in headings:
-        heading = row['lowest_heading']
-        if heading:
-            # Find the first line that matches the heading (case-insensitive, stripped)
-            idx = next((i for i, l in enumerate(lines) if l.strip().lower() == heading.lower()), None)
-            heading_indices.append(idx)
-        else:
-            heading_indices.append(None)
-
-    # Now, for each heading, the chunk is from its line to the next heading's line
-    chunks = []
-    for i, row in enumerate(headings):
-        start = heading_indices[i]
-        # If heading not found, skip
-        if start is None:
-            continue
-        # End at the next found heading, or end of document
-        next_indices = [idx for idx in heading_indices[i+1:] if idx is not None]
-        end = next_indices[0] if next_indices else len(lines)
-        chunk_text = "\n".join(lines[start:end])
-        chunk = {
-            "index": i,
-            "section": row['section'],
-            "subsection": row['subsection'],
-            "subsubsection": row['subsubsection'],
-            "subsubsubsection": row['subsubsubsection'],
-            "subsubsubsubsection": row['subsubsubsubsection'],
-            "start_page": row.get('start page'),
-            "end_page": row.get('end page'),
-            "heading": row['lowest_heading'],
-            "text": chunk_text
-        }
-        chunks.append(chunk)
-    return chunks
-
-def build_chunks_from_csv_and_pages(csv_path, page_dir, prefix="core_rules_p", ext=".txt"):
-    headings = read_headings_csv(csv_path)
-    chunks = []
-    for idx, row in enumerate(headings):
-        start_page = row['start page']
-        end_page = row['end page']
-        chunk_text = get_page_texts(page_dir, start_page, end_page, prefix=prefix, ext=ext)
-        # Optionally, you can try to further split chunk_text by the heading text if you want even more precision
-        chunks.append({
-            "index": idx,
-            "section": row['section'],
-            "subsection": row['subsection'],
-            "subsubsection": row['subsubsection'],
-            "subsubsubsection": row['subsubsubsection'],
-            "subsubsubsubsection": row['subsubsubsubsection'],
-            "start_page": start_page,
-            "end_page": end_page,
-            "text": chunk_text
-        })
-    return chunks
 # ========== PREPROCESSING ==========
 def preprocess_and_get_page_map(text):
     lines = text.split('\n')
@@ -139,12 +70,7 @@ def extract_text_from_txt(txt_path: str) -> str:
         return file.read()
 
 # ========== PDF PAGE EXTRACTION ==========
-def extract_text_from_pdf(pdf_path):
-    text = ""
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            text += page.extract_text() + "\n"
-    return text
+
 def is_subsub_heading(line):
     # Exclude known footers
     if "Daggerheart SRD" in line:
@@ -168,25 +94,6 @@ def is_subsub_heading(line):
             return True
     return False
 
-def split_by_subsub_headings(text):
-    lines = text.split('\n')
-    chunks = []
-    buffer = []
-    current_heading = None
-    for i, line in enumerate(lines):
-        if is_subsub_heading(line):
-            # Check if next line is a list item (don't split if so)
-            if i+1 < len(lines) and re.match(r"^(\*|\-|\d+\.)", lines[i+1].strip()):
-                buffer.append(line)
-                continue
-            if buffer:
-                chunks.append({"subsub_heading": current_heading, "text": "\n".join(buffer)})
-                buffer = []
-            current_heading = line.strip()
-        buffer.append(line)
-    if buffer:
-        chunks.append({"subsub_heading": current_heading, "text": "\n".join(buffer)})
-    return chunks
 
 def extract_page_text(pdf_path: str, page_number: int) -> str:
     with open(pdf_path, "rb") as file:
@@ -263,81 +170,6 @@ def extract_sections_from_pdf(pdf_path: str, headings: list):
             page_num = heading_pages.get(current_title, None)
             sections.append(({"Section": current_title, "Page": page_num}, "\n".join(current_section).strip()))
         return sections
-def extract_full_text_two_columns(pdf_path):
-    import pdfplumber
-    all_text = []
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            mid_x = page.width / 2
-            left = page.within_bbox((0, 0, mid_x, page.height)).extract_text() or ""
-            right = page.within_bbox((mid_x, 0, page.width, page.height)).extract_text() or ""
-            # Read left column, then right column
-            all_text.append(left)
-            all_text.append(right)
-    return "\n".join(all_text)
-def extract_all_pages_two_columns(pdf_path):
-    all_pages = []
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            mid_x = page.width / 2
-            left = page.within_bbox((0, 0, mid_x, page.height)).extract_text() or ""
-            right = page.within_bbox((mid_x, 0, page.width, page.height)).extract_text() or ""
-            # Store as a tuple (left, right)
-            all_pages.append((left, right))
-    return all_pages
-def get_chunk_text_from_pages(all_pages, start_page, end_page):
-    # start_page/end_page are 1-based, all_pages is 0-based
-    texts = []
-    for page_num in range(int(start_page)-1, int(end_page)):
-        if 0 <= page_num < len(all_pages):
-            left, right = all_pages[page_num]
-            texts.append(left + "\n" + right)
-    return "\n".join(texts)
-# ========== SUBSUBSECTION EXTRACTION ==========
-
-
-def split_by_subsub_headings(text):
-    # Adjust this regex to match your sub-sub-section style!
-    subsub_re = re.compile(r"^(STEP \d+|[A-Z][A-Za-z0-9\s\-]+:|[A-Z][A-Za-z0-9\s\-]+)$", re.MULTILINE)
-    lines = text.split('\n')
-    chunks = []
-    buffer = []
-    current_heading = None
-    for line in lines:
-        if subsub_re.match(line.strip()):
-            if buffer:
-                chunks.append({"subsub_heading": current_heading, "text": "\n".join(buffer)})
-                buffer = []
-            current_heading = line.strip()
-        buffer.append(line)
-    if buffer:
-        chunks.append({"subsub_heading": current_heading, "text": "\n".join(buffer)})
-    return chunks
-
-def semantic_split(text, embedder, max_chunk_tokens=200, min_chunk_tokens=50):
-    paras = [p.strip() for p in text.split('\n') if p.strip()]
-    if not paras:
-        return []
-    if sum(len(p.split()) for p in paras) <= max_chunk_tokens:
-        return ["\n".join(paras)]
-    para_embs = embedder.encode(paras, normalize_embeddings=True)
-    sims = [util.cos_sim(para_embs[i], para_embs[i+1]).item() for i in range(len(para_embs)-1)]
-    split_points = []
-    for i, sim in enumerate(sims):
-        if sim < 0.7:
-            split_points.append(i+1)
-    split_points = [0] + split_points + [len(paras)]
-    chunks = []
-    for i in range(len(split_points)-1):
-        chunk_paras = paras[split_points[i]:split_points[i+1]]
-        chunk_text = "\n".join(chunk_paras)
-        if len(chunk_text.split()) > max_chunk_tokens and len(chunk_paras) > 1:
-            mid = len(chunk_paras) // 2
-            chunks.extend(semantic_split("\n".join(chunk_paras[:mid]), embedder, max_chunk_tokens, min_chunk_tokens))
-            chunks.extend(semantic_split("\n".join(chunk_paras[mid:]), embedder, max_chunk_tokens, min_chunk_tokens))
-        elif len(chunk_text.split()) >= min_chunk_tokens:
-            chunks.append(chunk_text)
-    return chunks
 
 # ========== STAT BLOCK CHUNKING FOR ADVERSARIES.PDF ==========
 def chunk_stat_blocks_from_pdf(pdf_path: str):
