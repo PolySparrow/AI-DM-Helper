@@ -1,13 +1,12 @@
-import openai
-import logging
-#import config
 import random
 import json
 import random
+import requests
 import logging_function
 logger = logging_function.setup_logger()
 
-
+OLLAMA_URL = "http://localhost:11434/api/generate"
+OLLAMA_MODEL = "llama3"
 def format_history_for_llama(history):
     role_map = {
         "system": "System",
@@ -61,6 +60,30 @@ def roll_labeled_dice_text_from_json(json_input):
     lines.append(f"Total sum: {total}")
     return "\n".join(lines)
 
+
+def summarize_history_with_llm(history, model=OLLAMA_MODEL):
+    # Use your LLM to summarize the history (excluding the last N messages)
+    prompt = (
+        "Summarize the following conversation in 2-3 sentences for context:\n\n"
+        + "\n".join(f"{msg['role'].capitalize()}: {msg['content']}" for msg in history)
+    )
+    response = requests.post(
+        OLLAMA_URL,
+        json={"model": model, "prompt": prompt, "stream": False}
+    )
+    return response.json()["response"]
+
+def build_hybrid_history(history, max_recent=10, model=OLLAMA_MODEL):
+    if len(history) > max_recent + 2:
+        summary = summarize_history_with_llm(history[:-max_recent], model=model)
+        # Compose a new history: system, summary, last N messages
+        hybrid_history = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "assistant", "content": f"Summary so far: {summary}"},
+        ] + history[-max_recent:]
+        return hybrid_history
+    else:
+        return history
 # Example usage:
 # json_input = '''
 # [

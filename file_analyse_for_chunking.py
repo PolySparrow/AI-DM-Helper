@@ -1,4 +1,6 @@
 import pdfplumber
+import logging_function
+logger = logging_function.setup_logger()
 
 def get_font_sizes(pdf_path):
     font_sizes = []

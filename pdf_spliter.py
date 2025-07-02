@@ -79,3 +79,19 @@ split_skip_pages("./source/DH-SRD-1.0-June-26-2025.pdf", 119, 135, "./source/dom
 #reader = PdfReader("input.pdf")
 #total_pages = len(reader.pages)
 #split_skip_pages("input.pdf", 5, total_pages, [8], "output_from_5_skip_8.pdf")
+
+import pdfplumber
+
+def pdf_to_text(pdf_path, txt_path):
+    with pdfplumber.open(pdf_path) as pdf:
+        all_text = []
+        for page in pdf.pages:
+            page_text = page.extract_text(layout=True)
+            if page_text:
+                all_text.append(page_text)
+        full_text = "\n".join(all_text)
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write(full_text)
+
+# Usage:
+pdf_to_text("./source/core_rules.pdf", "./source/core_rules.txt")

@@ -162,6 +162,9 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
             seen.add(r["text"])
     # Rerank and get scores
     reranked_results = rerank(user_query, unique_results, top_n=k)
+
+    # Filter out low-confidence results
+    reranked_results = [(r, score) for r, score in reranked_results if score >= confidence_threshold]
     # Print confidence scores and chunk info
     print("\nTop reranked results with confidence scores:")
     for idx, (result, score) in enumerate(reranked_results, 1):
@@ -170,12 +173,14 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
     # Check top score
     top_score = reranked_results[0][1] if reranked_results else 0
     low_confidence_msg = ""
-    if top_score < confidence_threshold:
+    if not reranked_results:
         low_confidence_msg = (
-            "\nWARNING: The confidence score for the best match is low. "
-            "Please try to be more specific in your question.\n"
+        "\nWARNING: No high-confidence matches found. "
+        "Please try to be more specific in your question.\n"
         )
-        print(low_confidence_msg)
+        logger.info("No reranked results above threshold.")
+    else:
+        low_confidence_msg = ""
     logger.info(f"Top score: {top_score:.4f} (threshold: {confidence_threshold})")
     logger.debug(f"Reranked results: {reranked_results}")
     # Summarize with Ollama, passing both result and score, and add warning to prompt

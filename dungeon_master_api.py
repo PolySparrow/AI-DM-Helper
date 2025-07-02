@@ -52,6 +52,7 @@ def hybrid_search_route():
     logger.debug(f"Knowledge Bases: {kb_names}")    
     user_query = dm_functions.get_latest_user_message(history)
     logger.debug(f"User query: {user_query}")
+    history = dm_functions.build_hybrid_history(history, model=OLLAMA_MODEL)
     if not user_query:
         return jsonify({"success": False, "error": "No user message found in history"}), 400
 
