@@ -3,6 +3,7 @@ import json
 import random
 import requests
 import logging_function
+import os
 logger = logging_function.setup_logger()
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
@@ -84,6 +85,19 @@ def build_hybrid_history(history, max_recent=10, model=OLLAMA_MODEL):
         return hybrid_history
     else:
         return history
+    
+
+
+def find_kb_file(kb_name, source_dir="./source"):
+    """
+    Returns the full path to the file in source_dir whose base name matches kb_name,
+    or None if not found.
+    """
+    for fname in os.listdir(source_dir):
+        base, ext = os.path.splitext(fname)
+        if base == kb_name and ext.lower() in [".txt", ".pdf", ".docx", ".csv", ".xlsx"]:
+            return os.path.join(source_dir, fname)
+    return None
 # Example usage:
 # json_input = '''
 # [

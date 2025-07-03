@@ -7,6 +7,9 @@ import numpy as np
 import dungeon_master_functions as dm_functions
 import search_files as search_files
 import requests
+from build_embeddings import embedding_generator
+from sentence_transformers import SentenceTransformer
+import os
 # Setup logger
 logger = logging_function.setup_logger()
 OLLAMA_URL = "http://localhost:11434/api/generate"
@@ -14,6 +17,9 @@ OLLAMA_MODEL = "llama3"
 
 
 app = Flask(__name__)
+
+EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
+embedder = SentenceTransformer(EMBEDDING_MODEL)
 
 @app.route('/')
 def home():
@@ -70,6 +76,50 @@ def hybrid_search_route():
         })
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/refresh_embeddings', methods=['POST'])
+def refresh_embeddings():
+    data = request.get_json()
+    kb_names = data.get('kb_names', [])
+    if not kb_names:
+        return jsonify({'success': False, 'error': 'No KB names provided'}), 400
+
+    results = {}
+    for kb_name in kb_names:
+        file_path = dm_functions.find_kb_file(kb_name)
+        if not file_path:
+            results[kb_name] = "File not found"
+            continue
+        try:
+            embedding_generator(
+                FILE_PATH=file_path,
+                embedder=embedder,
+                BATCH_SIZE=20,
+                headings_csv_path="./source/Daggerheart_context_extended.csv"
+            )
+            results[kb_name] = "Success"
+        except Exception as e:
+            results[kb_name] = f"Exception: {str(e)}"
+    return jsonify({'success': True, 'results': results})
+
+@app.route('/knowledge_bases', methods=['GET'])
+def get_knowledge_bases():
+    source_dir = "./source"
+    KB_DESCRIPTIONS = {
+        "core_rules": "Core RPG rules and mechanics.",
+        "adversaries": "Monster stats and lore.",
+        "environments": "Environment descriptions and hazards.",
+        "domain_card_reference": "Description of domain cards and their effects.",
+    }
+    kb_list = []
+    for fname in os.listdir(source_dir):
+        base, ext = os.path.splitext(fname)
+        if ext.lower() in [".txt", ".pdf", ".docx", ".csv", ".xlsx"]:
+            kb_list.append({
+                "name": base,
+                "description": KB_DESCRIPTIONS.get(base, "")
+            })
+    return jsonify({"knowledge_bases": kb_list})
 
 if __name__ == "__main__":
     logger = logging_function.setup_logger()
