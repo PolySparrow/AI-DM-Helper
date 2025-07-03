@@ -16,6 +16,18 @@ from sentence_transformers import util
 import logging_function
 logger = logging_function.setup_logger()
 
+patterns = [
+    r'page\s*\d+',
+    r'daggerheart srd',
+    r'https?://\S+',
+    r'\b[\w\.-]+@[\w\.-]+\.\w+\b',
+    r'\[\d+\]',
+    r'\bsection\s*\d+(\.\d+)*\b',
+    r'[-_]{2,}',
+    r'\*{2,}',
+    r'^\d+\.\s+',
+    r'\xa0',
+]
 
 def read_headings_csv(csv_path):
     headings = []
@@ -53,7 +65,20 @@ def preprocess_and_get_page_map(text):
     return "\n".join(clean_lines), page_map
 
 def preprocess_text(text, remove_patterns=None):
-
+    print("preprocess_text called with remove_patterns:", remove_patterns)
+    if remove_patterns is None:
+        remove_patterns = [
+            r'page\s*\d+',
+            r'daggerheart srd',
+            r'https?://\S+',
+            r'\b[\w\.-]+@[\w\.-]+\.\w+\b',
+            r'\[\d+\]',
+            r'\bsection\s*\d+(\.\d+)*\b',
+            r'[-_]{2,}',
+            r'\*{2,}',
+            r'^\d+\.\s+',
+            r'\xa0',
+        ]
     text = text.lower()
     text = ''.join(filter(lambda x: x in string.printable, text))
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
@@ -173,6 +198,8 @@ def extract_sections_from_pdf(pdf_path: str, headings: list):
 
 # ========== STAT BLOCK CHUNKING FOR ADVERSARIES.PDF ==========
 def chunk_stat_blocks_from_pdf(pdf_path: str):
+    print('Stat Block Started')
+    logger.debug(f"Chunking stat blocks from PDF: {pdf_path}")
     stat_blocks = []
     name_pattern = re.compile(r'^[A-Z][A-Z\s\-]+[A-Z]$')
     skip_words = {"FEATURES"}
@@ -208,6 +235,8 @@ def chunk_stat_blocks_from_pdf(pdf_path: str):
 
 # ========== DOMAIN CARD CHUNKING FROM PDF ==========
 def chunk_domain_cards_from_pdf(pdf_path: str):
+    print('Domain Card Started')
+    logger.debug(f"Chunking domain cards from PDF: {pdf_path}")
     card_blocks = []
     domain_pattern = re.compile(r'^[A-Z\s]+DOMAIN$')
     card_pattern = re.compile(r'^(■\s*)?([A-Z][A-Z\s\-]+[A-Z])$')
@@ -402,8 +431,11 @@ def embedding_generator(
     FILE_PATH,
     embedder,
     BATCH_SIZE=20,
-    headings_csv_path="./source/Daggerheart_context_extended.csv"
+    headings_csv_path="./source/Daggerheart_context_extended.csv",
+    heading_columns=None,
+    filter_dict=None
 ):
+
     if not os.path.exists(headings_csv_path):
         raise FileNotFoundError(f"CSV not found: {headings_csv_path}")
     else:
@@ -430,11 +462,12 @@ def embedding_generator(
         stat_blocks = chunk_stat_blocks_from_pdf(FILE_PATH)
         chunk_dicts = []
         for idx, block in enumerate(stat_blocks):
+            print('Processing block:', idx, block["name"])
             chunk_dicts.append({
                 "index": idx,
                 "name": block["name"],
                 "page": block["page"],
-                "text": preprocess_text(block["text"], patterns)
+                "text": preprocess_text(block["text"])
             })
         texts = [c["text"] for c in chunk_dicts]
     elif base.lower() == "domain_card_reference":
@@ -447,7 +480,7 @@ def embedding_generator(
                 "domain": block["domain"],
                 "name": block["name"],
                 "page": block["page"],
-                "text": preprocess_text(block["text"], patterns)
+                "text": preprocess_text(block["text"])
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext in [".csv", ".xlsx"]:
@@ -457,7 +490,7 @@ def embedding_generator(
             heading_columns=heading_columns,
             filter_dict=filter_dict
         )
-        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in raw_sections]
+        raw_sections = [(h, preprocess_text(s)) for h, s in raw_sections]
         chunk_dicts = []
         for idx, (headings, text) in enumerate(raw_sections):
             chunk_dicts.append({
@@ -468,7 +501,7 @@ def embedding_generator(
         texts = [c["text"] for c in chunk_dicts]
     elif ext == ".pdf":
         print("Searching for Table of Contents page...")
-        toc_page = TOC_PAGE
+        toc_page = None
         if toc_page is None:
             toc_page = find_toc_page(FILE_PATH, max_search_pages=10)
         if toc_page is not None:
@@ -480,7 +513,7 @@ def embedding_generator(
         headings = extract_section_headings(toc_text)
         print(f"Section headings found in ToC: {headings}")
         section_chunks = extract_sections_from_pdf(FILE_PATH, headings)
-        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in section_chunks]
+        raw_sections = [(h, preprocess_text(s)) for h, s in section_chunks]
         chunk_dicts = []
         for idx, (headings, text) in enumerate(raw_sections):
             chunk_dicts.append({
@@ -492,7 +525,7 @@ def embedding_generator(
     elif ext == ".docx":
         print("Extracting and chunking DOCX by heading...")
         section_chunks = extract_sections_from_docx(FILE_PATH)
-        raw_sections = [(h, preprocess_text(s, patterns)) for h, s in section_chunks]
+        raw_sections = [(h, preprocess_text(s)) for h, s in section_chunks]
         chunk_dicts = []
         for idx, (headings, text) in enumerate(raw_sections):
             chunk_dicts.append({
@@ -507,7 +540,7 @@ def embedding_generator(
         chunk_dicts = [{
             "index": 0,
             "headings": None,
-            "text": preprocess_text(full_text, patterns)
+            "text": preprocess_text(full_text)
         }]
         texts = [chunk_dicts[0]["text"]]
     else:

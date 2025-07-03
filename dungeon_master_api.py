@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 
 
 from datetime import datetime
@@ -11,13 +12,15 @@ from build_embeddings import embedding_generator
 from sentence_transformers import SentenceTransformer
 import os
 # Setup logger
-logger = logging_function.setup_logger()
+
 OLLAMA_URL = "http://localhost:11434/api/generate"
 OLLAMA_MODEL = "llama3"
 
 
 app = Flask(__name__)
 
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+logger = logging_function.setup_logger()
 EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
 embedder = SentenceTransformer(EMBEDDING_MODEL)
 
@@ -79,28 +82,38 @@ def hybrid_search_route():
 
 @app.route('/refresh_embeddings', methods=['POST'])
 def refresh_embeddings():
+    logger.info("Received request to /refresh_embeddings")
     data = request.get_json()
+    logger.debug(f"Request JSON: {data}")
+
     kb_names = data.get('kb_names', [])
     if not kb_names:
+        logger.warning("No KB names provided in request")
         return jsonify({'success': False, 'error': 'No KB names provided'}), 400
 
     results = {}
     for kb_name in kb_names:
+        logger.info(f"Processing KB: {kb_name}")
         file_path = dm_functions.find_kb_file(kb_name)
         if not file_path:
+            logger.error(f"File not found for KB: {kb_name}")
             results[kb_name] = "File not found"
             continue
         try:
+            logger.info(f"Starting embedding generation for {kb_name} at {file_path}")
             embedding_generator(
                 FILE_PATH=file_path,
                 embedder=embedder,
                 BATCH_SIZE=20,
                 headings_csv_path="./source/Daggerheart_context_extended.csv"
             )
+            logger.info(f"Successfully refreshed embeddings for {kb_name}")
             results[kb_name] = "Success"
         except Exception as e:
+            logger.exception(f"Exception while refreshing {kb_name}: {e}")
             results[kb_name] = f"Exception: {str(e)}"
-    return jsonify({'success': True, 'results': results})
+    logger.info(f"Refresh results: {results}")
+    return jsonify({'success': True, "response": 'Knowledge Base Refreshed', 'results': results})
 
 @app.route('/knowledge_bases', methods=['GET'])
 def get_knowledge_bases():

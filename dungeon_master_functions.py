@@ -88,13 +88,17 @@ def build_hybrid_history(history, max_recent=10, model=OLLAMA_MODEL):
     
 
 
-def find_kb_file(kb_name, source_dir="./source"):
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SOURCE_DIR = os.path.join(BASE_DIR, "source")
+
+def find_kb_file(kb_name, source_dir=SOURCE_DIR):
     """
     Returns the full path to the file in source_dir whose base name matches kb_name,
     or None if not found.
     """
     for fname in os.listdir(source_dir):
         base, ext = os.path.splitext(fname)
+        logger.debug(f"Checking file: {fname}, base: {base}, ext: {ext}")
         if base == kb_name and ext.lower() in [".txt", ".pdf", ".docx", ".csv", ".xlsx"]:
             return os.path.join(source_dir, fname)
     return None

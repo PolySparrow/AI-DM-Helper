@@ -60,7 +60,7 @@
     "domain": "ARCANA DOMAIN",
     "name": "CHAIN LIGHTNING",
     "page": 1,
-    "text": "chain lightning level 5 arcana spell recall cost: 1 mark 2 stress to make a spellcast roll, unleashing lightning on all targets within close range. targets you succeed against must make a reaction roll with a difficulty equal to the result of your spellcast roll. targets who fail take 2d8+4 magic damage. additional adversaries not already targeted by chain lightning and within close range of previous targets who took damage must also make the reaction roll. targets who fail take 2d8+4 magic damage. this chain continues until there are no more adversaries within range. 119 daggerheart srd"
+    "text": "chain lightning level 5 arcana spell recall cost: 1 mark 2 stress to make a spellcast roll, unleashing lightning on all targets within close range. targets you succeed against must make a reaction roll with a difficulty equal to the result of your spellcast roll. targets who fail take 2d8+4 magic damage. additional adversaries not already targeted by chain lightning and within close range of previous targets who took damage must also make the reaction roll. targets who fail take 2d8+4 magic damage. this chain continues until there are no more adversaries within range. 119"
   },
   {
     "index": 9,
@@ -130,7 +130,7 @@
     "domain": null,
     "name": "FALLING SKY",
     "page": 2,
-    "text": "falling sky level 10 arcana spell recall cost: 1 make a spellcast roll against all adversaries within far range. mark any number of stress to make shards of arcana rain down from above. targets you succeed against take 1d20+2 magic damage for each stress marked. 120 daggerheart srd"
+    "text": "falling sky level 10 arcana spell recall cost: 1 make a spellcast roll against all adversaries within far range. mark any number of stress to make shards of arcana rain down from above. targets you succeed against take 1d20+2 magic damage for each stress marked. 120"
   },
   {
     "index": 19,
@@ -228,7 +228,7 @@
     "domain": "BLADE DOMAIN",
     "name": "BATTLE CRY",
     "page": 3,
-    "text": "battle cry level 8 blade ability recall cost: 2 once per long rest, while youre charging into danger, you can muster a rousing call that inspires your allies. all allies who can hear you each clear a stress and gain a hope. additionally, your allies gain advantage on attack rolls until you or an ally rolls a failure with fear. 121 daggerheart srd"
+    "text": "battle cry level 8 blade ability recall cost: 2 once per long rest, while youre charging into danger, you can muster a rousing call that inspires your allies. all allies who can hear you each clear a stress and gain a hope. additionally, your allies gain advantage on attack rolls until you or an ally rolls a failure with fear. 121"
   },
   {
     "index": 33,
@@ -298,7 +298,7 @@
     "domain": "BONE DOMAIN",
     "name": "TACTICIAN",
     "page": 4,
-    "text": "tactician level 3 bone ability recall cost: 1 when you help an ally, they can spend a hope to add one of your experiences to their roll alongside your advantage die. when making a tag t eam roll, you can roll a d20 as your hope die. 122 daggerheart srd"
+    "text": "tactician level 3 bone ability recall cost: 1 when you help an ally, they can spend a hope to add one of your experiences to their roll alongside your advantage die. when making a tag t eam roll, you can roll a d20 as your hope die. 122"
   },
   {
     "index": 43,
@@ -389,7 +389,7 @@
     "domain": null,
     "name": "SWIFT STEP",
     "page": 5,
-    "text": "swift step level 10 bone ability recall cost: 2 when an attack made against you fails, clear a stress. if you cant clear a stress, gain a hope. 123 daggerheart srd"
+    "text": "swift step level 10 bone ability recall cost: 2 when an attack made against you fails, clear a stress. if you cant clear a stress, gain a hope. 123"
   },
   {
     "index": 56,
@@ -438,7 +438,7 @@
     "domain": "CODEX DOMAIN",
     "name": "BOOK OF EXOTA",
     "page": 6,
-    "text": "book of exota level 4 codex grimoire recall cost: 3 repudiate: you can interrupt a magical effect taking place. make a reaction roll using your spellcast trait. once per rest on a success, the effect stops and any consequences are avoided. create construct: spend a hope to choose a group of objects around you and create an animated construct from them that obeys basic commands. make a spellcast roll to command them to take action. when necessary, they share your evasion and traits and their attacks deal 2d10+3 physical damage. you can only maintain one construct at a time, and they fall apart when they take any amount of damage. 124 daggerheart srd"
+    "text": "book of exota level 4 codex grimoire recall cost: 3 repudiate: you can interrupt a magical effect taking place. make a reaction roll using your spellcast trait. once per rest on a success, the effect stops and any consequences are avoided. create construct: spend a hope to choose a group of objects around you and create an animated construct from them that obeys basic commands. make a spellcast roll to command them to take action. when necessary, they share your evasion and traits and their attacks deal 2d10+3 physical damage. you can only maintain one construct at a time, and they fall apart when they take any amount of damage. 124"
   },
   {
     "index": 63,
@@ -494,7 +494,7 @@
     "domain": null,
     "name": "SAFE HAVEN",
     "page": 7,
-    "text": "safe haven level 8 codex spell recall cost: 3 when you have a few minutes of calm to focus, you can spend 2 hope to summon your safe haven, a large interdimensional home where you and your allies can take shelter. when you do, a magical door appears somewhere within close range. only creatures of your choice can enter. once inside, you can make the entrance invisible. you and anyone else inside can always exit. once you leave, the doorway must be summoned again. when you take a rest within your own safe haven, you can choose an additional downtime move. 125 daggerheart srd"
+    "text": "safe haven level 8 codex spell recall cost: 3 when you have a few minutes of calm to focus, you can spend 2 hope to summon your safe haven, a large interdimensional home where you and your allies can take shelter. when you do, a magical door appears somewhere within close range. only creatures of your choice can enter. once inside, you can make the entrance invisible. you and anyone else inside can always exit. once you leave, the doorway must be summoned again. when you take a rest within your own safe haven, you can choose an additional downtime move. 125"
   },
   {
     "index": 71,
@@ -564,7 +564,7 @@
     "domain": "GRACE DOMAIN",
     "name": "SOOTHING SPEECH",
     "page": 8,
-    "text": "soothing speech level 4 grace ability recall cost: 1 during a short rest, when you take the time to comfort another character while using the t end to wounds downtime move on them, clear an additional hit point on that character. when you do, you also clear 2 hit points. 126 daggerheart srd"
+    "text": "soothing speech level 4 grace ability recall cost: 1 during a short rest, when you take the time to comfort another character while using the t end to wounds downtime move on them, clear an additional hit point on that character. when you do, you also clear 2 hit points. 126"
   },
   {
     "index": 81,
@@ -648,7 +648,7 @@
     "domain": null,
     "name": "NOTORIOUS",
     "page": 9,
-    "text": "notorious level 10 grace ability recall cost: 0 people know who you are and what youve done, and they treat you differently because of it. when you leverage your notoriety to get what you want, you can mark a stress before you roll to gain a +10 bonus to the result. your food and drinks are always free wherever you go, and everything else you buy is reduced in price by one bag of gold (to a minimum of one handful). this card doesnt count against your loadouts domain card maximum of 5 and cant be placed in your vault. 127 daggerheart srd"
+    "text": "notorious level 10 grace ability recall cost: 0 people know who you are and what youve done, and they treat you differently because of it. when you leverage your notoriety to get what you want, you can mark a stress before you roll to gain a +10 bonus to the result. your food and drinks are always free wherever you go, and everything else you buy is reduced in price by one bag of gold (to a minimum of one handful). this card doesnt count against your loadouts domain card maximum of 5 and cant be placed in your vault. 127"
   },
   {
     "index": 93,
@@ -718,7 +718,7 @@
     "domain": "MIDNIGHT DOMAIN",
     "name": "PHANTOM RETREAT",
     "page": 10,
-    "text": "phantom retreat level 5 midnight spell recall cost: 2 spend a hope to activate phantom retreat where youre currently standing. spend another hope at any time before your next rest to disappear from where you are and reappear where you were standing when you activated phantom retreat. this spell ends after you reappear. 128 daggerheart srd"
+    "text": "phantom retreat level 5 midnight spell recall cost: 2 spend a hope to activate phantom retreat where youre currently standing. spend another hope at any time before your next rest to disappear from where you are and reappear where you were standing when you activated phantom retreat. this spell ends after you reappear. 128"
   },
   {
     "index": 103,
@@ -781,7 +781,7 @@
     "domain": null,
     "name": "SPECTER OF THE DARK",
     "page": 11,
-    "text": "specter of the dark level 10 midnight spell recall cost: 1 mark a stress to become spectral until you make an action roll targeting another creature. while spectral, youre immune to physical damage and can float and pass through solid objects. other creatures can still see you while youre in this form. 129 daggerheart srd"
+    "text": "specter of the dark level 10 midnight spell recall cost: 1 mark a stress to become spectral until you make an action roll targeting another creature. while spectral, youre immune to physical damage and can float and pass through solid objects. other creatures can still see you while youre in this form. 129"
   },
   {
     "index": 112,
@@ -837,7 +837,7 @@
     "domain": "SAGE DOMAIN",
     "name": "THORN SKIN",
     "page": 12,
-    "text": "thorn skin level 5 sage spell recall cost: 1 once per rest, spend a hope to sprout thorns all over your body. when you do, place a number of tokens equal to your spellcast trait on this card. when you take damage, you can spend any number of tokens to roll that number of d6s. add the results together and reduce the incoming damage by that amount. if youre within melee range of the attacker, deal that amount of damage back to them. when you take a rest, clear all unspent tokens. 130 daggerheart srd"
+    "text": "thorn skin level 5 sage spell recall cost: 1 once per rest, spend a hope to sprout thorns all over your body. when you do, place a number of tokens equal to your spellcast trait on this card. when you take damage, you can spend any number of tokens to roll that number of d6s. add the results together and reduce the incoming damage by that amount. if youre within melee range of the attacker, deal that amount of damage back to them. when you take a rest, clear all unspent tokens. 130"
   },
   {
     "index": 120,
@@ -900,7 +900,7 @@
     "domain": null,
     "name": "FORCE OF NATURE",
     "page": 13,
-    "text": "force of nature level 10 sage spell recall cost: 2 mark a stress to transform into a hulking nature spirit, gaining the following benefits: when you succeed on an attack or spellcast roll, gain a +10 bonus to the damage roll. when you deal enough damage to defeat a creature within close range, you absorb them and clear an armor slot. you cant be restrained . before you make an action roll, you must spend a hope. if you cant, you revert to your normal form. 131 daggerheart srd"
+    "text": "force of nature level 10 sage spell recall cost: 2 mark a stress to transform into a hulking nature spirit, gaining the following benefits: when you succeed on an attack or spellcast roll, gain a +10 bonus to the damage roll. when you deal enough damage to defeat a creature within close range, you absorb them and clear an armor slot. you cant be restrained . before you make an action roll, you must spend a hope. if you cant, you revert to your normal form. 131"
   },
   {
     "index": 129,
@@ -963,7 +963,7 @@
     "domain": "SPLENDOR DOMAIN",
     "name": "LIFE WARD",
     "page": 14,
-    "text": "life ward level 4 splendor spell recall cost: 1 spend 3 hope and choose an ally within close range. they are marked with a glowing sigil of protection. when this ally would make a death move, they clear a hit point instead. this effect ends when it saves the target from a death move, you cast life ward on another target, or you take a long rest. 132 daggerheart srd"
+    "text": "life ward level 4 splendor spell recall cost: 1 spend 3 hope and choose an ally within close range. they are marked with a glowing sigil of protection. when this ally would make a death move, they clear a hit point instead. this effect ends when it saves the target from a death move, you cast life ward on another target, or you take a long rest. 132"
   },
   {
     "index": 138,
@@ -1040,7 +1040,7 @@
     "domain": null,
     "name": "RESURRECTION",
     "page": 15,
-    "text": "resurrection level 10 splendor spell recall cost: 2 make a spellcast roll (20). on a success, restore one creature who has been dead no longer than 100years to full strength. then roll a d6. on a result of 5 or lower, place this card in your vault permanently. on a failure, you cant cast resurrection again for a week. 133 daggerheart srd"
+    "text": "resurrection level 10 splendor spell recall cost: 2 make a spellcast roll (20). on a success, restore one creature who has been dead no longer than 100years to full strength. then roll a d6. on a result of 5 or lower, place this card in your vault permanently. on a failure, you cant cast resurrection again for a week. 133"
   },
   {
     "index": 149,
@@ -1138,7 +1138,7 @@
     "domain": "VALOR DOMAIN",
     "name": "VALOR-TOUCHED",
     "page": 16,
-    "text": "valor-touched level 7 valor ability recall cost: 1 when 4 or more of the domain cards in your loadout are from the valor domain, gain the following benefits: +1 bonus to your armor score when you mark 1 or more hit points without marking an armor slot, clear an armor slot. 134 daggerheart srd"
+    "text": "valor-touched level 7 valor ability recall cost: 1 when 4 or more of the domain cards in your loadout are from the valor domain, gain the following benefits: +1 bonus to your armor score when you mark 1 or more hit points without marking an armor slot, clear an armor slot. 134"
   },
   {
     "index": 163,
@@ -1180,6 +1180,6 @@
     "domain": null,
     "name": "UNYIELDING ARMOR",
     "page": 17,
-    "text": "unyielding armor level 10 valor ability recall cost: 1 when you would mark an armor slot, roll a number of d6s equal to your proficiency. if any roll a 6, reduce the severity by one threshold without marking an armor slot. 135 daggerheart srd"
+    "text": "unyielding armor level 10 valor ability recall cost: 1 when you would mark an armor slot, roll a number of d6s equal to your proficiency. if any roll a 6, reduce the severity by one threshold without marking an armor slot. 135"
   }
 ]
