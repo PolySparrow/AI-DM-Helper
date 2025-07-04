@@ -14,7 +14,11 @@ from sentence_transformers import SentenceTransformer
 from collections import defaultdict
 from sentence_transformers import util
 import logging_function
-logger = logging_function.setup_logger()
+import logging
+import time
+from environment_vars import EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, SOURCE_DIR
+
+logger = logging.getLogger(__name__)
 
 patterns = [
     r'page\s*\d+',
@@ -356,7 +360,7 @@ def get_embeddings(texts, embedder):
     return embedder.encode(texts, normalize_embeddings=True)
 
 # ========== OUTPUT PATHS ==========
-def get_output_paths(source_path, embeddings_dir="./embeddings", chunks_dir="./chunks"):
+def get_output_paths(source_path, embeddings_dir=EMBEDDINGS_DIR, chunks_dir=CHUNKS_DIR):
     base = os.path.splitext(os.path.basename(source_path))[0]
     embeddings_path = os.path.join(embeddings_dir, f"{base}_embeddings.npy")
     chunks_path = os.path.join(chunks_dir, f"{base}_chunks.json")
@@ -574,11 +578,12 @@ def embedding_generator(
     print("Done! You can now load these files in your search app.")
 
 if __name__ == "__main__":
-    EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
-    embedder = SentenceTransformer(EMBEDDING_MODEL)
+    start = time.perf_counter()
+    model = EMBEDDING_MODEL
+    embedder = SentenceTransformer(model)
 
     # Example: process all files in ./source
-    source_dir = "./source"
+    source_dir = SOURCE_DIR
     skip_files = {
         'DH-SRD-1.0-June-26-2025.pdf',
         'Daggerheart_context_extended.csv',
@@ -602,3 +607,5 @@ if __name__ == "__main__":
             embedder=embedder,
             headings_csv_path="./source/Daggerheart_context_extended.csv"
         )
+    end = time.perf_counter()
+    print(f"Script took {end - start:.2f} seconds")

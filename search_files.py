@@ -8,19 +8,16 @@ import nltk
 from nltk.corpus import wordnet as wn
 import dungeon_master_functions as dm_functions
 import logging_function
+from environment_vars import OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, CROSS_ENCODER_MODEL
+import logging
 
 # Setup logger
-logger = logging_function.setup_logger()
+logger = logging.getLogger(__name__)
 
 # ========== CONFIG ==========
-EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
-EMBEDDINGS_DIR = "./embeddings"
-CHUNKS_DIR = "./chunks"
-OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"
 
 embedder = SentenceTransformer(EMBEDDING_MODEL)
-reranker = CrossEncoder('cross-encoder/ms-marco-electra-base')
+reranker = CrossEncoder(CROSS_ENCODER_MODEL)
 
 # ========== DYNAMIC LOADING ==========
 def load_all_indexes(embeddings_dir, chunks_dir):
@@ -38,7 +35,7 @@ def load_all_indexes(embeddings_dir, chunks_dir):
                 index.add(embeddings)
                 knowledge_bases[kb_name] = {"index": index, "chunks": chunks}
             else:
-                print(f"Warning: No chunk file for {kb_name} in {chunks_dir}")
+                logger.debug(f"Warning: No chunk file for {kb_name} in {chunks_dir}")
     return knowledge_bases
 
 knowledge_bases = load_all_indexes(EMBEDDINGS_DIR, CHUNKS_DIR)
@@ -124,9 +121,9 @@ def format_prompt(results, user_query, chunk_char_limit=None, low_confidence_msg
 # ========== SUMMARIZATION WITH OLLAMA ==========
 def summarize_with_ollama(reranked_results, user_query, model=OLLAMA_MODEL, low_confidence_msg="", history=None):
     prompt = format_prompt(reranked_results, user_query, low_confidence_msg=low_confidence_msg, history=history)
-    print("\n--- Prompt sent to Ollama ---\n")
-    print(prompt)
-    print("\n--- End of prompt ---\n")
+    logger.info("\n--- Prompt sent to Ollama ---\n")
+    logger.info(prompt)
+    logger.info("\n--- End of prompt ---\n")
     response = requests.post(
         OLLAMA_URL,
         json={"model": model, "prompt": prompt, "stream": False}
@@ -137,14 +134,14 @@ def summarize_with_ollama(reranked_results, user_query, model=OLLAMA_MODEL, low_
 def hybrid_search_in_kbs_with_expansion_and_rerank(
     user_query, kb_names, history=None, k=3, model=OLLAMA_MODEL, confidence_threshold=0.5
 ):
-    print("I'm a stinky butthole")
+    
     if isinstance(kb_names, str):
         kb_names = [kb_names]
     all_results = []
     expanded_queries = expand_query_with_wordnet(user_query)
     for kb_name in kb_names:
         if kb_name not in knowledge_bases:
-            print(f"Knowledge base '{kb_name}' not found. Skipping.")
+            logger.info(f"Knowledge base '{kb_name}' not found. Skipping.")
             continue
         kb = knowledge_bases[kb_name]
         for q in expanded_queries:
@@ -168,8 +165,8 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
     # Print confidence scores and chunk info
     print("\nTop reranked results with confidence scores:")
     for idx, (result, score) in enumerate(reranked_results, 1):
-        print(f"{idx}. [Score: {score:.4f}] KB: {result.get('kb_name', '')} | Section: {result.get('headings', '')}")
-        print(f"   {result['text'][:200]}...\n")
+        logger.info(f"{idx}. [Score: {score:.4f}] KB: {result.get('kb_name', '')} | Section: {result.get('headings', '')}")
+        logger.debug(f"   {result['text'][:200]}...\n")
     # Check top score
     top_score = reranked_results[0][1] if reranked_results else 0
     low_confidence_msg = ""
@@ -195,7 +192,6 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
 # ========== MAIN ==========
 
 if __name__ == "__main__":
-    logger = logging_function.setup_logger()
     user_query = "When does the DM Generate Fear?"
     kb_name = ["core_rules"]
 

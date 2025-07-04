@@ -2,7 +2,8 @@ import os
 import glob
 import pandas as pd
 import logging_function
-logger = logging_function.setup_logger()
+import logging
+logger = logging.getLogger(__name__)
 
 # Directory containing the CSV files
 csv_dir = '.'  # Change this to your directory if needed

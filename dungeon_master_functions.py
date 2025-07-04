@@ -4,10 +4,11 @@ import random
 import requests
 import logging_function
 import os
-logger = logging_function.setup_logger()
+from environment_vars import OLLAMA_URL, OLLAMA_MODEL, SOURCE_DIR
+import logging
+logger = logging.getLogger(__name__)
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"
+
 def format_history_for_llama(history):
     role_map = {
         "system": "System",
@@ -88,8 +89,7 @@ def build_hybrid_history(history, max_recent=10, model=OLLAMA_MODEL):
     
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SOURCE_DIR = os.path.join(BASE_DIR, "source")
+
 
 def find_kb_file(kb_name, source_dir=SOURCE_DIR):
     """

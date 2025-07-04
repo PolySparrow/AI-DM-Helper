@@ -2,9 +2,11 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 import logging_function
-logger = logging_function.setup_logger()
+import logging
+from environment_vars import DM_API_URL, KNOWLEDGE_BASES, KB_DESCRIPTIONS
+logger = logging.getLogger(__name__)
 
-DUNGEON_MASTER_API_URL = "http://127.0.0.1:5001/api/v1.0/hybrid_search"
+DUNGEON_MASTER_API_URL = DM_API_URL
 
 class ChatboxServer:
     def __init__(self, dungeon_master_api_url):

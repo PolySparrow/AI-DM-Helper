@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 import logging_function
 import numpy as np
@@ -10,18 +10,20 @@ import search_files as search_files
 import requests
 from build_embeddings import embedding_generator
 from sentence_transformers import SentenceTransformer
+from environment_vars import 	OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, SOURCE_DIR, KNOWLEDGE_BASES, KB_DESCRIPTIONS
+import logging
+
 import os
 # Setup logger
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"
+
 
 
 app = Flask(__name__)
 
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
-logger = logging_function.setup_logger()
-EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
+logger = logging.getLogger(__name__)
+
 embedder = SentenceTransformer(EMBEDDING_MODEL)
 
 @app.route('/')
@@ -92,38 +94,40 @@ def refresh_embeddings():
         return jsonify({'success': False, 'error': 'No KB names provided'}), 400
 
     results = {}
-    for kb_name in kb_names:
-        logger.info(f"Processing KB: {kb_name}")
+
+    def process_kb(kb_name):
         file_path = dm_functions.find_kb_file(kb_name)
         if not file_path:
             logger.error(f"File not found for KB: {kb_name}")
-            results[kb_name] = "File not found"
-            continue
+            return (kb_name, "File not found")
         try:
             logger.info(f"Starting embedding generation for {kb_name} at {file_path}")
             embedding_generator(
                 FILE_PATH=file_path,
                 embedder=embedder,
-                BATCH_SIZE=20,
+                BATCH_SIZE=128,
                 headings_csv_path="./source/Daggerheart_context_extended.csv"
             )
             logger.info(f"Successfully refreshed embeddings for {kb_name}")
-            results[kb_name] = "Success"
+            return (kb_name, "Success")
         except Exception as e:
             logger.exception(f"Exception while refreshing {kb_name}: {e}")
-            results[kb_name] = f"Exception: {str(e)}"
+            return (kb_name, f"Exception: {str(e)}")
+
+    # Use ThreadPoolExecutor for parallel processing
+    with ThreadPoolExecutor(max_workers=min(4, len(kb_names))) as executor:
+        # Submit all jobs
+        future_to_kb = {executor.submit(process_kb, kb_name): kb_name for kb_name in kb_names}
+        for future in as_completed(future_to_kb):
+            kb_name, result = future.result()
+            results[kb_name] = result
+
     logger.info(f"Refresh results: {results}")
     return jsonify({'success': True, "response": 'Knowledge Base Refreshed', 'results': results})
 
 @app.route('/knowledge_bases', methods=['GET'])
 def get_knowledge_bases():
-    source_dir = "./source"
-    KB_DESCRIPTIONS = {
-        "core_rules": "Core RPG rules and mechanics.",
-        "adversaries": "Monster stats and lore.",
-        "environments": "Environment descriptions and hazards.",
-        "domain_card_reference": "Description of domain cards and their effects.",
-    }
+    source_dir = SOURCE_DIR
     kb_list = []
     for fname in os.listdir(source_dir):
         base, ext = os.path.splitext(fname)
@@ -135,7 +139,6 @@ def get_knowledge_bases():
     return jsonify({"knowledge_bases": kb_list})
 
 if __name__ == "__main__":
-    logger = logging_function.setup_logger()
     logger.debug("Starting the Dungeon Master API Flask app...")
     # Start the Flask app
     for rule in app.url_map.iter_rules():

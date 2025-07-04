@@ -1,6 +1,7 @@
 from PyPDF2 import PdfReader, PdfWriter
 import logging_function
-logger = logging_function.setup_logger()
+import logging
+logger = logging.getLogger(__name__)
 
 def split_skip_pages(input_path, start_page, end_page,  output_path, skip_pages,):
     """
