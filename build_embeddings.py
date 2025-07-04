@@ -13,12 +13,13 @@ import openpyxl
 from sentence_transformers import SentenceTransformer
 from collections import defaultdict
 from sentence_transformers import util
-import logging_function
+from logging_function import setup_logger
 import logging
 import time
 import hashlib
 from environment_vars import EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, SOURCE_DIR
 
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
 patterns = [

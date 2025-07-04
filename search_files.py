@@ -158,11 +158,13 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
 
     search_args = [(kb_name, q) for kb_name in kb_names for q in expanded_queries]
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        logger.debug(f"Starting parallel search for {len(search_args)} queries across {len(kb_names)} KBs...")
         futures = [executor.submit(search_one, arg) for arg in search_args]
         for future in as_completed(futures):
             all_results.extend(future.result())
 
     # Deduplicate by text
+    logger.debug(f"Start of deduplication. Total results: {len(all_results)}")
     seen = set()
     unique_results = []
     for r in all_results:
@@ -171,6 +173,7 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
             seen.add(r["text"])
 
     # --- Batch reranking ---
+    logger.debug(f"Starting reranking of unique results: {len(unique_results)}...")
     pairs = [(user_query, r['text']) for r in unique_results]
     if pairs:
         scores = reranker.predict(pairs)
@@ -181,7 +184,7 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
         reranked_results = []
 
     # Print confidence scores and chunk info
-    print("\nTop reranked results with confidence scores:")
+    logger.debug("Top reranked results with confidence scores:")
     for idx, (result, score) in enumerate(reranked_results, 1):
         logger.info(f"{idx}. [Score: {score:.4f}] KB: {result.get('kb_name', '')} | Section: {result.get('headings', '')}")
         logger.debug(f"   {result['text'][:200]}...\n")
@@ -215,6 +218,6 @@ if __name__ == "__main__":
     user_query = "When does the DM Generate Fear?"
     kb_name = ["core_rules"]
 
-    logger.info("\n--- Query Expansion + Reranking Example ---\n")
+    logger.info("--- Query Expansion + Reranking Example ---\n")
     answer = hybrid_search_in_kbs_with_expansion_and_rerank(user_query, kb_name, k=5, model=OLLAMA_MODEL)
     logger.info(answer)

@@ -3,7 +3,7 @@ from flask_cors import CORS
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-import logging_function
+from logging_function import setup_logger
 import numpy as np
 import dungeon_master_functions as dm_functions
 import search_files as search_files
@@ -22,6 +22,7 @@ import os
 app = Flask(__name__)
 
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
 embedder = SentenceTransformer(EMBEDDING_MODEL)

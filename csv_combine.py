@@ -1,8 +1,9 @@
 import os
 import glob
 import pandas as pd
-import logging_function
+from logging_function import setup_logger
 import logging
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
 # Directory containing the CSV files

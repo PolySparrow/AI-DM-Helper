@@ -2,10 +2,11 @@ import random
 import json
 import random
 import requests
-import logging_function
+from logging_function import setup_logger
 import os
 from environment_vars import OLLAMA_URL, OLLAMA_MODEL, SOURCE_DIR
 import logging
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
 
