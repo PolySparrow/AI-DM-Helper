@@ -1,6 +1,8 @@
 import pdfplumber
-import logging_function
-logger = logging_function.setup_logger()
+from logging_function import setup_logger
+import logging
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
+logger = logging.getLogger(__name__)
 
 def get_font_sizes(pdf_path):
     font_sizes = []

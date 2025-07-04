@@ -1,6 +1,7 @@
 from PyPDF2 import PdfReader, PdfWriter
-import logging_function
+from logging_function import setup_logger
 import logging
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
 def split_skip_pages(input_path, start_page, end_page,  output_path, skip_pages,):

@@ -7,11 +7,13 @@ from sentence_transformers import SentenceTransformer, CrossEncoder
 import nltk
 from nltk.corpus import wordnet as wn
 import dungeon_master_functions as dm_functions
-import logging_function
-from environment_vars import OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, CROSS_ENCODER_MODEL
+from logging_function import setup_logger
+from environment_vars import OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, CROSS_ENCODER_MODEL, MAX_WORKERS
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Setup logger
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
 # ========== CONFIG ==========
@@ -131,25 +133,35 @@ def summarize_with_ollama(reranked_results, user_query, model=OLLAMA_MODEL, low_
     return response.json()["response"]
 
 # ========== HYBRID SEARCH: QUERY EXPANSION + RERANKING ==========
+
+
 def hybrid_search_in_kbs_with_expansion_and_rerank(
     user_query, kb_names, history=None, k=3, model=OLLAMA_MODEL, confidence_threshold=0.5
 ):
-    
     if isinstance(kb_names, str):
         kb_names = [kb_names]
     all_results = []
     expanded_queries = expand_query_with_wordnet(user_query)
-    for kb_name in kb_names:
+
+    # --- Parallel search across KBs and expanded queries ---
+    def search_one(args):
+        kb_name, q = args
         if kb_name not in knowledge_bases:
             logger.info(f"Knowledge base '{kb_name}' not found. Skipping.")
-            continue
+            return []
         kb = knowledge_bases[kb_name]
-        for q in expanded_queries:
-            results = search_kb(q, kb, embedder, k=10)
-            for r in results:
-                r_copy = r.copy()
-                r_copy["kb_name"] = kb_name
-                all_results.append(r_copy)
+        results = search_kb(q, kb, embedder, k=10)
+        for r in results:
+            r_copy = r.copy()
+            r_copy["kb_name"] = kb_name
+        return results
+
+    search_args = [(kb_name, q) for kb_name in kb_names for q in expanded_queries]
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = [executor.submit(search_one, arg) for arg in search_args]
+        for future in as_completed(futures):
+            all_results.extend(future.result())
+
     # Deduplicate by text
     seen = set()
     unique_results = []
@@ -157,29 +169,37 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
         if r["text"] not in seen:
             unique_results.append(r)
             seen.add(r["text"])
-    # Rerank and get scores
-    reranked_results = rerank(user_query, unique_results, top_n=k)
 
-    # Filter out low-confidence results
-    reranked_results = [(r, score) for r, score in reranked_results if score >= confidence_threshold]
+    # --- Batch reranking ---
+    pairs = [(user_query, r['text']) for r in unique_results]
+    if pairs:
+        scores = reranker.predict(pairs)
+        reranked = sorted(zip(unique_results, scores), key=lambda x: -x[1])
+        reranked_results = reranked[:k]
+        reranked_results = [(r, score) for r, score in reranked_results if score >= confidence_threshold]
+    else:
+        reranked_results = []
+
     # Print confidence scores and chunk info
     print("\nTop reranked results with confidence scores:")
     for idx, (result, score) in enumerate(reranked_results, 1):
         logger.info(f"{idx}. [Score: {score:.4f}] KB: {result.get('kb_name', '')} | Section: {result.get('headings', '')}")
         logger.debug(f"   {result['text'][:200]}...\n")
+
     # Check top score
     top_score = reranked_results[0][1] if reranked_results else 0
     low_confidence_msg = ""
     if not reranked_results:
         low_confidence_msg = (
-        "\nWARNING: No high-confidence matches found. "
-        "Please try to be more specific in your question.\n"
+            "\nWARNING: No high-confidence matches found. "
+            "Please try to be more specific in your question.\n"
         )
         logger.info("No reranked results above threshold.")
     else:
         low_confidence_msg = ""
     logger.info(f"Top score: {top_score:.4f} (threshold: {confidence_threshold})")
     logger.debug(f"Reranked results: {reranked_results}")
+
     # Summarize with Ollama, passing both result and score, and add warning to prompt
     summary = summarize_with_ollama(
         reranked_results, user_query, model=model, low_confidence_msg=low_confidence_msg, history=history
@@ -195,6 +215,6 @@ if __name__ == "__main__":
     user_query = "When does the DM Generate Fear?"
     kb_name = ["core_rules"]
 
-    print("\n--- Query Expansion + Reranking Example ---\n")
+    logger.info("\n--- Query Expansion + Reranking Example ---\n")
     answer = hybrid_search_in_kbs_with_expansion_and_rerank(user_query, kb_name, k=5, model=OLLAMA_MODEL)
-    print(answer)
+    logger.info(answer)

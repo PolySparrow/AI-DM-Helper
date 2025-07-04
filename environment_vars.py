@@ -20,7 +20,7 @@ EMBEDDINGS_DIR = os.path.join(BASE_DIR, "embeddings")
 CHUNKS_DIR = os.path.join(BASE_DIR, "chunks")
 
 # Logging
-LOG_FILE = "AI_DM.log"
+LOG_FILE = "./AI_DM.log"
 LOG_LEVEL = logging.DEBUG
 
 # Knowledge Bases

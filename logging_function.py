@@ -2,29 +2,72 @@ import logging
 from environment_vars import LOG_FILE, LOG_LEVEL
 import os
 
+import logging
+import logging.config
+import os
+
+# Example environment variables (replace with your actual import)
+
 def setup_logger(
-    
     log_file=LOG_FILE,
-    mode_type='w',
-    level=LOG_LEVEL
+    level=LOG_LEVEL,
+    app_name='AI-DM'
 ):
-    """Function to setup a logger with a single file handler."""
+    log_dir = os.path.dirname(log_file)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    log_format = (
+        "[%(asctime)s] {app} [%(levelname)s] [%(name)s] %(message)s "
+        "[file=%(filename)s:%(lineno)d]"
+    ).format(app=app_name)
+
+    logging_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "standard": {
+                "format": log_format,
+                "datefmt": "%Y-%m-%d %H:%M:%S"
+            }
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": level,
+                "formatter": "standard",
+                "stream": "ext://sys.stdout"
+            },
+            "file": {
+                "class": "logging.handlers.TimedRotatingFileHandler",
+                "level": level,
+                "formatter": "standard",
+                "filename": log_file,
+                "when": "midnight",
+                "backupCount": 7,
+                "encoding": "utf8",
+                "utc": True
+            }
+        },
+        "loggers": {
+            "": {  # root logger
+                "handlers": ["console", "file"],
+                "level": level,
+                "propagate": False
+            }
+        }
+    }
+
+    logging.config.dictConfig(logging_config)
+
+# Usage example
+if __name__ == "__main__":
+    setup_logger(app_name="my-app")
     logger = logging.getLogger(__name__)
-    logger.setLevel(level)
-    formatter = logging.Formatter(
-        "[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
 
-    # Only add a file handler if not already present
-    if not any(
-        isinstance(h, logging.FileHandler) and h.baseFilename == log_file
-        for h in logger.handlers
-    ):
-        handler = logging.FileHandler(log_file, mode=mode_type)
-        handler.setFormatter(formatter)
-        handler.setLevel(level)
-        logger.addHandler(handler)
-
-    return logger
+    logger.debug("This is a DEBUG message.")
+    logger.info("This is an INFO message.")
+    logger.warning("This is a WARNING message.")
+    logger.error("This is an ERROR message.")
+    logger.critical("This is a CRITICAL message.")
 

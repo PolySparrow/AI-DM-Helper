@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
-import logging_function
+from logging_function import setup_logger
 import logging
 from environment_vars import DM_API_URL, KNOWLEDGE_BASES, KB_DESCRIPTIONS
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
 DUNGEON_MASTER_API_URL = DM_API_URL

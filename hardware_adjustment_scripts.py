@@ -4,7 +4,9 @@ import psutil
 from sentence_transformers import SentenceTransformer
 import sys
 import logging
+from logging_function import setup_logger 
 
+setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
 def get_device():

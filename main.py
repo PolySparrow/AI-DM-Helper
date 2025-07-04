@@ -1,12 +1,14 @@
 import subprocess
-import logging_function
+from logging_function import setup_logger
 import nltk
+import logging
 
 #nltk.download('wordnet')
 #nltk.download('omw-1.4')
 
 if __name__ == '__main__':
-    logger= logging_function.setup_logger()
+    setup_logger(app_name="AI_DM_RAG")  # This sets up logging, but returns nothing
+    logger = logging.getLogger(__name__)
 
 
     logger.info("Starting the Dungeon Master API and Flask app...")
