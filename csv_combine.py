@@ -31,4 +31,4 @@ master_df = pd.concat(dfs, ignore_index=True)
 # Write to master_list.csv
 master_df.to_csv('master_list.csv', index=False)
 
-print("Combined CSV written to master_list.csv")
+logger.debug("Combined CSV written to master_list.csv")

@@ -48,14 +48,14 @@ def pick_settings():
         "ram_gb": ram_gb,
         "gpu_mem_gb": gpu_mem_gb,
     }
-print("Python executable:", sys.executable)
-print("Torch version:", torch.__version__)
-print("CUDA available:", torch.cuda.is_available())
+logger.info("Python executable:", sys.executable)
+logger.info("Torch version:", torch.__version__)
+logger.info("CUDA available:", torch.cuda.is_available())
 if torch.cuda.is_available():
-    print("CUDA device count:", torch.cuda.device_count())
-    print("CUDA device name:", torch.cuda.get_device_name(0))
+    logger.info("CUDA device count:", torch.cuda.device_count())
+    logger.info("CUDA device name:", torch.cuda.get_device_name(0))
 else:
-    print("No CUDA device detected.")
+    logger.info("No CUDA device detected.")
 settings = pick_settings()
-print("Auto-detected settings:", settings)
+logger.info("Auto-detected settings:", settings)
 embedder = SentenceTransformer(settings["model"], device=settings["device"])

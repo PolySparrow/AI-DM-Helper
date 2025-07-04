@@ -10,7 +10,7 @@ import search_files as search_files
 import requests
 from build_embeddings import embedding_generator
 from sentence_transformers import SentenceTransformer
-from environment_vars import 	OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, SOURCE_DIR, KNOWLEDGE_BASES, KB_DESCRIPTIONS
+from environment_vars import 	OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, SOURCE_DIR, KNOWLEDGE_BASES, KB_DESCRIPTIONS, MAX_WORKERS
 import logging
 
 import os
@@ -115,7 +115,7 @@ def refresh_embeddings():
             return (kb_name, f"Exception: {str(e)}")
 
     # Use ThreadPoolExecutor for parallel processing
-    with ThreadPoolExecutor(max_workers=min(4, len(kb_names))) as executor:
+    with ThreadPoolExecutor(max_workers=min(MAX_WORKERS, len(kb_names))) as executor:
         # Submit all jobs
         future_to_kb = {executor.submit(process_kb, kb_name): kb_name for kb_name in kb_names}
         for future in as_completed(future_to_kb):
@@ -142,6 +142,6 @@ if __name__ == "__main__":
     logger.debug("Starting the Dungeon Master API Flask app...")
     # Start the Flask app
     for rule in app.url_map.iter_rules():
-        print(rule)
+        logger.debug(rule)
     app.run(debug=True,host='127.0.0.1', port=5001, use_reloader=False)
 

@@ -69,7 +69,7 @@ def preprocess_and_get_page_map(text):
     return "\n".join(clean_lines), page_map
 
 def preprocess_text(text, remove_patterns=None):
-    print("preprocess_text called with remove_patterns:", remove_patterns)
+    logger.debug("preprocess_text called with remove_patterns:", remove_patterns)
     if remove_patterns is None:
         remove_patterns = [
             r'page\s*\d+',
@@ -202,7 +202,7 @@ def extract_sections_from_pdf(pdf_path: str, headings: list):
 
 # ========== STAT BLOCK CHUNKING FOR ADVERSARIES.PDF ==========
 def chunk_stat_blocks_from_pdf(pdf_path: str):
-    print('Stat Block Started')
+    logger.debug('Stat Block Started')
     logger.debug(f"Chunking stat blocks from PDF: {pdf_path}")
     stat_blocks = []
     name_pattern = re.compile(r'^[A-Z][A-Z\s\-]+[A-Z]$')
@@ -239,7 +239,7 @@ def chunk_stat_blocks_from_pdf(pdf_path: str):
 
 # ========== DOMAIN CARD CHUNKING FROM PDF ==========
 def chunk_domain_cards_from_pdf(pdf_path: str):
-    print('Domain Card Started')
+    logger.debug('Domain Card Started')
     logger.debug(f"Chunking domain cards from PDF: {pdf_path}")
     card_blocks = []
     domain_pattern = re.compile(r'^[A-Z\s]+DOMAIN$')
@@ -377,7 +377,7 @@ def chunk_by_headings_sequential(full_text, headings):
         # Search for the heading after the last chunk's end
         start = next((j for j in range(last_end, len(lines)) if lines[j].strip().lower() == heading.strip().lower()), None)
         if start is None:
-            print(f"Warning: Heading '{heading}' not found after line {last_end}")
+            logger.warning(f"Warning: Heading '{heading}' not found after line {last_end}")
             continue
         # End at the next heading (after start)
         next_start = None
@@ -443,30 +443,30 @@ def embedding_generator(
     if not os.path.exists(headings_csv_path):
         raise FileNotFoundError(f"CSV not found: {headings_csv_path}")
     else:
-        print(f"Using headings from: {headings_csv_path}")
+        logger.debug(f"Using headings from: {headings_csv_path}")
     EMBEDDINGS_PATH, CHUNKS_PATH = get_output_paths(FILE_PATH)
     os.makedirs(os.path.dirname(EMBEDDINGS_PATH), exist_ok=True)
     os.makedirs(os.path.dirname(CHUNKS_PATH), exist_ok=True)
 
     ext = os.path.splitext(FILE_PATH)[1].lower()
     base = os.path.splitext(os.path.basename(FILE_PATH))[0]
-    print(f"Processing file: {FILE_PATH}")
+    logger.debug(f"Processing file: {FILE_PATH}")
 
     if base == "core_rules":
         headings = read_headings_csv(headings_csv_path)
-        print("Reading plain text file...")
+        logger.debug("Reading plain text file...")
         with open(FILE_PATH, "r", encoding="latin-1") as f:
             full_text = f.read()
         
-        print("Splitting by headings...")
+        logger.debug("Splitting by headings...")
         chunk_dicts = chunk_by_headings_sequential(full_text, headings)
         texts = [c["text"] for c in chunk_dicts]
     elif base.lower() == "adversaries" or base.lower() == "environments":
-        print("Special stat block chunking for adversaries.pdf ...")
+        logger.debug("Special stat block chunking for adversaries.pdf ...")
         stat_blocks = chunk_stat_blocks_from_pdf(FILE_PATH)
         chunk_dicts = []
         for idx, block in enumerate(stat_blocks):
-            print('Processing block:', idx, block["name"])
+            logger.debug('Processing block:', idx, block["name"])
             chunk_dicts.append({
                 "index": idx,
                 "name": block["name"],
@@ -475,7 +475,7 @@ def embedding_generator(
             })
         texts = [c["text"] for c in chunk_dicts]
     elif base.lower() == "domain_card_reference":
-        print("Special domain card chunking for domain_card_reference.pdf ...")
+        logger.debug("Special domain card chunking for domain_card_reference.pdf ...")
         card_blocks = chunk_domain_cards_from_pdf(FILE_PATH)
         chunk_dicts = []
         for idx, block in enumerate(card_blocks):
@@ -488,7 +488,7 @@ def embedding_generator(
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext in [".csv", ".xlsx"]:
-        print("Extracting and chunking table (CSV/XLSX)...")
+        logger.debug("Extracting and chunking table (CSV/XLSX)...")
         raw_sections = extract_chunks_from_table(
             FILE_PATH,
             heading_columns=heading_columns,
@@ -504,18 +504,18 @@ def embedding_generator(
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext == ".pdf":
-        print("Searching for Table of Contents page...")
+        logger.debug("Searching for Table of Contents page...")
         toc_page = None
         if toc_page is None:
             toc_page = find_toc_page(FILE_PATH, max_search_pages=10)
         if toc_page is not None:
-            print(f"Found ToC on page {toc_page+1}")
+            logger.debug(f"Found ToC on page {toc_page+1}")
             toc_text = extract_page_text(FILE_PATH, toc_page)
         else:
-            print("ToC not found, defaulting to page 2.")
+            logger.debug("ToC not found, defaulting to page 2.")
             toc_text = extract_page_text(FILE_PATH, 1)
         headings = extract_section_headings(toc_text)
-        print(f"Section headings found in ToC: {headings}")
+        logger.debug(f"Section headings found in ToC: {headings}")
         section_chunks = extract_sections_from_pdf(FILE_PATH, headings)
         raw_sections = [(h, preprocess_text(s)) for h, s in section_chunks]
         chunk_dicts = []
@@ -527,7 +527,7 @@ def embedding_generator(
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext == ".docx":
-        print("Extracting and chunking DOCX by heading...")
+        logger.debug("Extracting and chunking DOCX by heading...")
         section_chunks = extract_sections_from_docx(FILE_PATH)
         raw_sections = [(h, preprocess_text(s)) for h, s in section_chunks]
         chunk_dicts = []
@@ -539,7 +539,7 @@ def embedding_generator(
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext == ".txt":
-        print("Extracting and chunking TXT...")
+        logger.debug("Extracting and chunking TXT...")
         full_text = extract_text_from_txt(FILE_PATH)
         chunk_dicts = [{
             "index": 0,
@@ -550,32 +550,32 @@ def embedding_generator(
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
-    print(f"Chunk count: {len(chunk_dicts)}")
+    logger.debug(f"Chunk count: {len(chunk_dicts)}")
     for i, chunk in enumerate(chunk_dicts):
-        print(
+        logger.debug(
             f"Chunk {i}: {len(chunk['text']) // 4} tokens (approx), "
             f"Meta: {chunk.get('section')}, "
             f"Subsections: {chunk.get('subsection')}, {chunk.get('subsubsection')}, {chunk.get('subsubsubsection')}, {chunk.get('subsubsubsubsection')}"
         )
 
     # Generate embeddings in batches
-    print("Generating embeddings...")
+    logger.debug("Generating embeddings...")
     embeddings = []
     for i in range(0, len(chunk_dicts), BATCH_SIZE):
         batch_texts = texts[i:i+BATCH_SIZE]
         batch_embeddings = get_embeddings(batch_texts, embedder)
         embeddings.append(batch_embeddings)
-        print(f"Embedded batch {i//BATCH_SIZE + 1}/{(len(chunk_dicts)-1)//BATCH_SIZE + 1}")
+        logger.debug(f"Embedded batch {i//BATCH_SIZE + 1}/{(len(chunk_dicts)-1)//BATCH_SIZE + 1}")
     embeddings = np.vstack(embeddings)
 
     # Save to disk
-    print(f"Saving embeddings to {EMBEDDINGS_PATH} ...")
+    logger.debug(f"Saving embeddings to {EMBEDDINGS_PATH} ...")
     np.save(EMBEDDINGS_PATH, embeddings)
-    print(f"Saving chunks to {CHUNKS_PATH} ...")
+    logger.debug(f"Saving chunks to {CHUNKS_PATH} ...")
     with open(CHUNKS_PATH, "w", encoding="utf-8") as f:
         json.dump(chunk_dicts, f, ensure_ascii=False, indent=2)
 
-    print("Done! You can now load these files in your search app.")
+    logger.info("Done! You can now load these files in your search app.")
 
 if __name__ == "__main__":
     start = time.perf_counter()
@@ -594,12 +594,12 @@ if __name__ == "__main__":
     if not os.path.exists(headings_csv_path):
         raise FileNotFoundError(f"CSV not found: {headings_csv_path}")
     else:
-        print(f"Using headings from: {headings_csv_path}")
+        logger.debug(f"Using headings from: {headings_csv_path}")
     for fname in os.listdir(source_dir):
         if not fname.lower().endswith((".pdf", ".docx", ".txt", ".csv", ".xlsx")):
             continue
         if fname in skip_files:
-            print(f"Skipping {fname}")
+            logger.debug(f"Skipping {fname}")
             continue
         FILE_PATH = os.path.join(source_dir, fname)
         embedding_generator(
@@ -608,4 +608,4 @@ if __name__ == "__main__":
             headings_csv_path="./source/Daggerheart_context_extended.csv"
         )
     end = time.perf_counter()
-    print(f"Script took {end - start:.2f} seconds")
+    logger.debug(f"Script took {end - start:.2f} seconds")

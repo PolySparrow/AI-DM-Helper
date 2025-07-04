@@ -3,9 +3,11 @@ import logging
 
 # LLM/Embedding Models
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"
-EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"  # or "bge-base-en-v1.5" if you want
+#OLLAMA_MODEL = "phi-3-mini-128k-instruct.Q4_K_M.gguf" # Adjust as needed
+OLLAMA_MODEL = "llama3"  # Adjust as needed
+EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"  # or "bge-base-en-v1.5" if you want
 CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-electra-base"
+#CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"  # Adjust as needed
 DM_API_URL = "http://127.0.0.1:5001/api/v1.0/hybrid_search"
 
 BATCH_SIZE = 128  # Adjust based on your GPU memory
