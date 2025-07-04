@@ -16,6 +16,7 @@ from sentence_transformers import util
 import logging_function
 import logging
 import time
+import hashlib
 from environment_vars import EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, SOURCE_DIR
 
 logger = logging.getLogger(__name__)
@@ -430,6 +431,18 @@ def remove_footers_headers(text):
             continue
         clean_lines.append(line)
     return "\n".join(clean_lines)
+
+def hash_chunk(text):
+    return hashlib.sha256(text.encode('utf-8')).hexdigest()
+
+def load_previous_chunks_and_embeddings(chunks_path, embeddings_path):
+    if os.path.exists(chunks_path) and os.path.exists(embeddings_path):
+        with open(chunks_path, "r", encoding="utf-8") as f:
+            prev_chunks = json.load(f)
+        prev_embeddings = np.load(embeddings_path)
+        prev_hash_to_idx = {c['hash']: i for i, c in enumerate(prev_chunks) if 'hash' in c}
+        return prev_chunks, prev_embeddings, prev_hash_to_idx
+    return [], None, {}
 # ========== MAIN WORKFLOW ==========
 def embedding_generator(
     FILE_PATH,
@@ -558,19 +571,46 @@ def embedding_generator(
             f"Subsections: {chunk.get('subsection')}, {chunk.get('subsubsection')}, {chunk.get('subsubsubsection')}, {chunk.get('subsubsubsubsection')}"
         )
 
-    # Generate embeddings in batches
-    logger.debug("Generating embeddings...")
-    embeddings = []
-    for i in range(0, len(chunk_dicts), BATCH_SIZE):
-        batch_texts = texts[i:i+BATCH_SIZE]
-        batch_embeddings = get_embeddings(batch_texts, embedder)
-        embeddings.append(batch_embeddings)
-        logger.debug(f"Embedded batch {i//BATCH_SIZE + 1}/{(len(chunk_dicts)-1)//BATCH_SIZE + 1}")
-    embeddings = np.vstack(embeddings)
+    # === DELTA LOGIC ===
+    # 1. Hash each chunk
+    for c in chunk_dicts:
+        c['hash'] = hash_chunk(c['text'])
 
-    # Save to disk
+    # 2. Load previous chunks and embeddings
+    prev_chunks, prev_embeddings, prev_hash_to_idx = load_previous_chunks_and_embeddings(CHUNKS_PATH, EMBEDDINGS_PATH)
+
+    # 3. Prepare new embeddings array
+    new_embeddings = []
+    to_embed = []
+    to_embed_indices = []
+
+    for idx, c in enumerate(chunk_dicts):
+        h = c['hash']
+        if h in prev_hash_to_idx:
+            # Reuse old embedding
+            prev_idx = prev_hash_to_idx[h]
+            new_embeddings.append(prev_embeddings[prev_idx])
+        else:
+            # Need to embed this chunk
+            new_embeddings.append(None)  # Placeholder
+            to_embed.append(c['text'])
+            to_embed_indices.append(idx)
+
+    # 4. Embed only new/changed chunks in batches
+    if to_embed:
+        logger.info(f"Delta embedding: {len(to_embed)} new/changed chunks out of {len(chunk_dicts)}")
+        for i in range(0, len(to_embed), BATCH_SIZE):
+            batch_texts = to_embed[i:i+BATCH_SIZE]
+            batch_embeddings = get_embeddings(batch_texts, embedder)
+            for j, emb in enumerate(batch_embeddings):
+                idx_in_new = to_embed_indices[i + j]
+                new_embeddings[idx_in_new] = emb
+    else:
+        logger.info("No new or changed chunks to embed.")
+
+    # 5. Save new chunks and embeddings
     logger.debug(f"Saving embeddings to {EMBEDDINGS_PATH} ...")
-    np.save(EMBEDDINGS_PATH, embeddings)
+    np.save(EMBEDDINGS_PATH, np.vstack(new_embeddings))
     logger.debug(f"Saving chunks to {CHUNKS_PATH} ...")
     with open(CHUNKS_PATH, "w", encoding="utf-8") as f:
         json.dump(chunk_dicts, f, ensure_ascii=False, indent=2)
