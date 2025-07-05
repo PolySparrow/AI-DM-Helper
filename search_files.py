@@ -8,7 +8,7 @@ import nltk
 from nltk.corpus import wordnet as wn
 import dungeon_master_functions as dm_functions
 from logging_function import setup_logger
-from environment_vars import OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, CROSS_ENCODER_MODEL, MAX_WORKERS
+from environment_vars import OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, CROSS_ENCODER_MODEL, MAX_WORKERS,DEVICE
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 # ========== CONFIG ==========
 
-embedder = SentenceTransformer(EMBEDDING_MODEL)
-reranker = CrossEncoder(CROSS_ENCODER_MODEL)
+embedder = SentenceTransformer(EMBEDDING_MODEL, device=DEVICE)
+reranker = CrossEncoder(CROSS_ENCODER_MODEL, device=DEVICE)
 
 # ========== DYNAMIC LOADING ==========
 def load_all_indexes(embeddings_dir, chunks_dir):

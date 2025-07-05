@@ -17,7 +17,7 @@ from logging_function import setup_logger
 import logging
 import time
 import hashlib
-from environment_vars import EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, SOURCE_DIR
+from environment_vars import EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, SOURCE_DIR, DEVICE
 
 setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
@@ -620,8 +620,8 @@ def embedding_generator(
 
 if __name__ == "__main__":
     start = time.perf_counter()
-    model = EMBEDDING_MODEL
-    embedder = SentenceTransformer(model)
+
+    embedder = SentenceTransformer(EMBEDDING_MODEL, device=DEVICE)
 
     # Example: process all files in ./source
     source_dir = SOURCE_DIR

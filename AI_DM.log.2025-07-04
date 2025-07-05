@@ -1,0 +1,1079 @@
+[2025-07-04 13:46:53] AI_DM_RAG [INFO] [__main__] Starting the Dungeon Master API and Flask app... [file=main.py:14]
+[2025-07-04 13:46:53] AI_DM_RAG [INFO] [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000 [file=_internal.py:97]
+[2025-07-04 13:46:53] AI_DM_RAG [INFO] [werkzeug] [33mPress CTRL+C to quit[0m [file=_internal.py:97]
+[2025-07-04 13:46:53] AI_DM_RAG [INFO] [werkzeug]  * Restarting with stat [file=_internal.py:97]
+[2025-07-04 13:46:53] AI_DM_RAG [DEBUG] [faiss.loader] Environment variable FAISS_OPT_LEVEL is not set, so let's pick the instruction set according to the current CPU [file=loader.py:89]
+[2025-07-04 13:46:53] AI_DM_RAG [INFO] [faiss.loader] Loading faiss with AVX2 support. [file=loader.py:125]
+[2025-07-04 13:46:54] AI_DM_RAG [INFO] [faiss.loader] Successfully loaded faiss with AVX2 support. [file=loader.py:127]
+[2025-07-04 13:46:54] AI_DM_RAG [INFO] [faiss] Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss. [file=__init__.py:186]
+[2025-07-04 13:46:54] AI_DM_RAG [WARNING] [werkzeug]  * Debugger is active! [file=_internal.py:97]
+[2025-07-04 13:46:54] AI_DM_RAG [INFO] [werkzeug]  * Debugger PIN: 133-217-281 [file=_internal.py:97]
+[2025-07-04 13:46:58] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Use pytorch device_name: cpu [file=SentenceTransformer.py:211]
+[2025-07-04 13:46:58] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5 [file=SentenceTransformer.py:219]
+[2025-07-04 13:46:58] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTPS connection (1): huggingface.co:443 [file=connectionpool.py:1049]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config_sentence_transformers.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config_sentence_transformers.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/sentence_bert_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/sentence_bert_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/adapter_config.json HTTP/1.1" 404 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:46:59] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/revision/main HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5 HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/cross-encoder/ms-marco-electra-base/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:00] AI_DM_RAG [INFO] [sentence_transformers.cross_encoder.CrossEncoder] Use pytorch device: cpu [file=CrossEncoder.py:224]
+[2025-07-04 13:47:00] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/cross-encoder/ms-marco-electra-base HTTP/1.1" 200 2564 [file=connectionpool.py:544]
+[2025-07-04 13:47:30] AI_DM_RAG [INFO] [werkzeug]  * Detected change in 'D:\\git\\AI-DM-Helper\\build_embeddings.py', reloading [file=_internal.py:97]
+[2025-07-04 13:47:30] AI_DM_RAG [INFO] [werkzeug]  * Restarting with stat [file=_internal.py:97]
+[2025-07-04 13:47:30] AI_DM_RAG [WARNING] [werkzeug]  * Debugger is active! [file=_internal.py:97]
+[2025-07-04 13:47:30] AI_DM_RAG [INFO] [werkzeug]  * Debugger PIN: 133-217-281 [file=_internal.py:97]
+[2025-07-04 13:47:42] AI_DM_RAG [INFO] [__main__] Starting the Dungeon Master API and Flask app... [file=main.py:14]
+[2025-07-04 13:47:43] AI_DM_RAG [INFO] [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000 [file=_internal.py:97]
+[2025-07-04 13:47:43] AI_DM_RAG [INFO] [werkzeug] [33mPress CTRL+C to quit[0m [file=_internal.py:97]
+[2025-07-04 13:47:43] AI_DM_RAG [INFO] [werkzeug]  * Restarting with stat [file=_internal.py:97]
+[2025-07-04 13:47:43] AI_DM_RAG [DEBUG] [faiss.loader] Environment variable FAISS_OPT_LEVEL is not set, so let's pick the instruction set according to the current CPU [file=loader.py:89]
+[2025-07-04 13:47:43] AI_DM_RAG [INFO] [faiss.loader] Loading faiss with AVX2 support. [file=loader.py:125]
+[2025-07-04 13:47:43] AI_DM_RAG [INFO] [faiss.loader] Successfully loaded faiss with AVX2 support. [file=loader.py:127]
+[2025-07-04 13:47:43] AI_DM_RAG [INFO] [faiss] Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss. [file=__init__.py:186]
+[2025-07-04 13:47:43] AI_DM_RAG [WARNING] [werkzeug]  * Debugger is active! [file=_internal.py:97]
+[2025-07-04 13:47:43] AI_DM_RAG [INFO] [werkzeug]  * Debugger PIN: 133-217-281 [file=_internal.py:97]
+[2025-07-04 13:47:48] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Use pytorch device_name: cpu [file=SentenceTransformer.py:211]
+[2025-07-04 13:47:48] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5 [file=SentenceTransformer.py:219]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTPS connection (1): huggingface.co:443 [file=connectionpool.py:1049]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config_sentence_transformers.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config_sentence_transformers.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/sentence_bert_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/sentence_bert_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/adapter_config.json HTTP/1.1" 404 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64 [file=connectionpool.py:544]
+[2025-07-04 13:47:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/revision/main HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 13:47:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5 HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 13:47:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/cross-encoder/ms-marco-electra-base/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64 [file=connectionpool.py:544]
+[2025-07-04 13:47:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:50] AI_DM_RAG [INFO] [sentence_transformers.cross_encoder.CrossEncoder] Use pytorch device: cpu [file=CrossEncoder.py:224]
+[2025-07-04 13:47:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/cross-encoder/ms-marco-electra-base HTTP/1.1" 200 2564 [file=connectionpool.py:544]
+[2025-07-04 13:47:50] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Use pytorch device_name: cpu [file=SentenceTransformer.py:211]
+[2025-07-04 13:47:50] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5 [file=SentenceTransformer.py:219]
+[2025-07-04 13:47:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config_sentence_transformers.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config_sentence_transformers.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/sentence_bert_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/sentence_bert_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/adapter_config.json HTTP/1.1" 404 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64 [file=connectionpool.py:544]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/revision/main HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5 HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [__main__] Starting the Dungeon Master API Flask app... [file=dungeon_master_api.py:143]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [__main__] /static/<path:filename> [file=dungeon_master_api.py:146]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [__main__] / [file=dungeon_master_api.py:146]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [__main__] /api/v1.0/roll_dice [file=dungeon_master_api.py:146]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [__main__] /api/v1.0/hybrid_search [file=dungeon_master_api.py:146]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [__main__] /refresh_embeddings [file=dungeon_master_api.py:146]
+[2025-07-04 13:47:52] AI_DM_RAG [DEBUG] [__main__] /knowledge_bases [file=dungeon_master_api.py:146]
+[2025-07-04 13:47:52] AI_DM_RAG [INFO] [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001 [file=_internal.py:97]
+[2025-07-04 13:47:52] AI_DM_RAG [INFO] [werkzeug] [33mPress CTRL+C to quit[0m [file=_internal.py:97]
+[2025-07-04 13:48:33] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:48:33] "OPTIONS /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:48:33] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): 127.0.0.1:5001 [file=connectionpool.py:241]
+[2025-07-04 13:48:33] AI_DM_RAG [DEBUG] [__main__] Received request for hybrid search [file=dungeon_master_api.py:59]
+[2025-07-04 13:48:33] AI_DM_RAG [DEBUG] [__main__] History: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}] [file=dungeon_master_api.py:63]
+[2025-07-04 13:48:33] AI_DM_RAG [DEBUG] [__main__] Knowledge Bases: ['core_rules'] [file=dungeon_master_api.py:64]
+[2025-07-04 13:48:33] AI_DM_RAG [DEBUG] [__main__] User query: What is daggerheart? [file=dungeon_master_api.py:66]
+[2025-07-04 13:48:35] AI_DM_RAG [DEBUG] [search_files] Starting parallel search for 13 queries across 1 KBs... [file=search_files.py:161]
+[2025-07-04 13:48:35] AI_DM_RAG [DEBUG] [search_files] Start of deduplication. Total results: 130 [file=search_files.py:167]
+[2025-07-04 13:48:35] AI_DM_RAG [DEBUG] [search_files] Starting reranking of unique results... [file=search_files.py:176]
+[2025-07-04 13:48:40] AI_DM_RAG [DEBUG] [search_files] Top reranked results with confidence scores: [file=search_files.py:187]
+[2025-07-04 13:48:40] AI_DM_RAG [INFO] [search_files] 1. [Score: 0.9934] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 13:48:40] AI_DM_RAG [DEBUG] [search_files]    WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or...
+ [file=search_files.py:190]
+[2025-07-04 13:48:40] AI_DM_RAG [INFO] [search_files] 2. [Score: 0.9856] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 13:48:40] AI_DM_RAG [DEBUG] [search_files]    FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at th...
+ [file=search_files.py:190]
+[2025-07-04 13:48:40] AI_DM_RAG [INFO] [search_files] 3. [Score: 0.8955] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 13:48:40] AI_DM_RAG [DEBUG] [search_files]    WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick...
+ [file=search_files.py:190]
+[2025-07-04 13:48:40] AI_DM_RAG [INFO] [search_files] Top score: 0.9934 (threshold: 0.5) [file=search_files.py:203]
+[2025-07-04 13:48:40] AI_DM_RAG [DEBUG] [search_files] Reranked results: [({'text': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.', 'headings': None, 'score': 0.7185972929000854, 'formatted': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.'}, np.float32(0.9934412)), ({'text': 'FLOW OF THE GAME\nDaggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.\nPLAYER PRINCIPLES & BEST PRACTICES\nTo get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:\nPRINCIPLES\nï¿½ Be a fan of your character and their journey.\nï¿½ Spotlight your friends.\nï¿½ Address the characters and address the players.\nï¿½ Build the world together.\nï¿½ Play to find out what happens.\nï¿½ Hold on gently.\nBEST PRACTICES\nï¿½ Embrace danger.\nï¿½ Use your resources.\nï¿½ Tell the story.\nï¿½ Discover your character.\nFor more information, see the Daggerheart Core Rulebook, pages 9 and 108.', 'headings': None, 'score': 0.6768210530281067, 'formatted': 'FLOW OF THE GAME\nDaggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.\nPLAYER PRINCIPLES & BEST PRACTICES\nTo get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:\nPRINCIPLES\nï¿½ Be a fan of your character and their journey.\nï¿½ Spotlight your friends.\nï¿½ Address the characters and address the players.\nï¿½ Build the world together.\nï¿½ Play to find out what happens.\nï¿½ Hold on gently.\nBEST PRACTICES\nï¿½ Embrace danger.\nï¿½ Use your resources.\nï¿½ Tell the story.\nï¿½ Discover your character.\nFor more information, see the Daggerheart Core Rulebook, pages 9 and 108.'}, np.float32(0.985603)), ({'text': 'WHAT IS THIS?\nThis is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.\nYou can use this SRD in several ways:\nï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.\nï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.\nï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).\nï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.\nIn short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!\nTHE BASICS', 'headings': None, 'score': 0.7058262825012207, 'formatted': 'WHAT IS THIS?\nThis is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.\nYou can use this SRD in several ways:\nï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.\nï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.\nï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).\nï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.\nIn short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!\nTHE BASICS'}, np.float32(0.8955001))] [file=search_files.py:204]
+[2025-07-04 13:48:40] AI_DM_RAG [DEBUG] [search_files] Formatted prompt for Ollama:
+You are an expert RPG assistant.
+1. [Score: 0.9934] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+2. [Score: 0.9856] []
+FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.
+PLAYER PRINCIPLES & BEST PRACTICES
+To get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:
+PRINCIPLES
+ï¿½ Be a fan of your character and their journey.
+ï¿½ Spotlight your friends.
+ï¿½ Address the characters and address the players.
+ï¿½ Build the world together.
+ï¿½ Play to find out what happens.
+ï¿½ Hold on gently.
+BEST PRACTICES
+ï¿½ Embrace danger.
+ï¿½ Use your resources.
+ï¿½ Tell the story.
+ï¿½ Discover your character.
+For more information, see the Daggerheart Core Rulebook, pages 9 and 108.
+
+3. [Score: 0.8955] []
+WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.
+You can use this SRD in several ways:
+ï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.
+ï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.
+ï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).
+ï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.
+In short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!
+THE BASICS
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+User's question: "What is daggerheart?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:120]
+[2025-07-04 13:48:40] AI_DM_RAG [INFO] [search_files] 
+--- Prompt sent to Ollama ---
+ [file=search_files.py:126]
+[2025-07-04 13:48:40] AI_DM_RAG [INFO] [search_files] You are an expert RPG assistant.
+1. [Score: 0.9934] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+2. [Score: 0.9856] []
+FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.
+PLAYER PRINCIPLES & BEST PRACTICES
+To get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:
+PRINCIPLES
+ï¿½ Be a fan of your character and their journey.
+ï¿½ Spotlight your friends.
+ï¿½ Address the characters and address the players.
+ï¿½ Build the world together.
+ï¿½ Play to find out what happens.
+ï¿½ Hold on gently.
+BEST PRACTICES
+ï¿½ Embrace danger.
+ï¿½ Use your resources.
+ï¿½ Tell the story.
+ï¿½ Discover your character.
+For more information, see the Daggerheart Core Rulebook, pages 9 and 108.
+
+3. [Score: 0.8955] []
+WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.
+You can use this SRD in several ways:
+ï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.
+ï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.
+ï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).
+ï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.
+In short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!
+THE BASICS
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+User's question: "What is daggerheart?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:127]
+[2025-07-04 13:48:40] AI_DM_RAG [INFO] [search_files] 
+--- End of prompt ---
+ [file=search_files.py:128]
+[2025-07-04 13:48:40] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): localhost:11434 [file=connectionpool.py:241]
+[2025-07-04 13:48:45] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://localhost:11434 "POST /api/generate HTTP/1.1" 200 None [file=connectionpool.py:544]
+[2025-07-04 13:48:45] AI_DM_RAG [DEBUG] [__main__] Answer: Daggerheart is a tabletop roleplaying game designed for 2-5 players, with one Game Master (GM). The game is about building a collaborative story through conversation between the GM and players. The system uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcomes of actions taken by the player characters.
+
+According to section 1 [Score: 0.9934], Daggerheart is played as follows: the GM describes situations, narrates events, and controls adversaries or obstacles, while players roleplay their character's reactions. The game uses action rolls, which involve rolling Duality Dice, adding modifiers, and comparing the result to a Difficulty set by the GM.
+
+I hope this answers your question! [file=dungeon_master_api.py:75]
+[2025-07-04 13:48:45] AI_DM_RAG [DEBUG] [__main__] Used Knowledge Bases: ['core_rules'] [file=dungeon_master_api.py:76]
+[2025-07-04 13:48:45] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:48:45] "POST /api/v1.0/hybrid_search HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:48:45] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://127.0.0.1:5001 "POST /api/v1.0/hybrid_search HTTP/1.1" 200 826 [file=connectionpool.py:544]
+[2025-07-04 13:48:45] AI_DM_RAG [DEBUG] [__main__] DM API request payload: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}], ['core_rules'] [file=chatbox_server.py:34]
+[2025-07-04 13:48:45] AI_DM_RAG [DEBUG] [__main__] DM API request URL: http://127.0.0.1:5001/api/v1.0/hybrid_search [file=chatbox_server.py:35]
+[2025-07-04 13:48:45] AI_DM_RAG [INFO] [__main__] DM API response status: 200 [file=chatbox_server.py:36]
+[2025-07-04 13:48:45] AI_DM_RAG [DEBUG] [__main__] DM API response content: {
+  "response": "Daggerheart is a tabletop roleplaying game designed for 2-5 players, with one Game Master (GM). The game is about building a collaborative story through conversation between the GM and players. The system uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcomes of actions taken by the player characters.\n\nAccording to section 1 [Score: 0.9934], Daggerheart is played as follows: the GM describes situations, narrates events, and controls adversaries or obstacles, while players roleplay their character's reactions. The game uses action rolls, which involve rolling Duality Dice, adding modifiers, and comparing the result to a Difficulty set by the GM.\n\nI hope this answers your question!",
+  "success": true,
+  "used_kbs": [
+    "core_rules"
+  ]
+}
+ [file=chatbox_server.py:37]
+[2025-07-04 13:48:45] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:48:45] "POST /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:49:11] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:49:11] "OPTIONS /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:49:11] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): 127.0.0.1:5001 [file=connectionpool.py:241]
+[2025-07-04 13:49:11] AI_DM_RAG [DEBUG] [__main__] Received request for hybrid search [file=dungeon_master_api.py:59]
+[2025-07-04 13:49:11] AI_DM_RAG [DEBUG] [__main__] History: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}] [file=dungeon_master_api.py:63]
+[2025-07-04 13:49:11] AI_DM_RAG [DEBUG] [__main__] Knowledge Bases: ['core_rules', 'adversaries', 'environments', 'domain_card_reference'] [file=dungeon_master_api.py:64]
+[2025-07-04 13:49:11] AI_DM_RAG [DEBUG] [__main__] User query: What is daggerheart? [file=dungeon_master_api.py:66]
+[2025-07-04 13:49:11] AI_DM_RAG [DEBUG] [search_files] Starting parallel search for 52 queries across 4 KBs... [file=search_files.py:161]
+[2025-07-04 13:49:13] AI_DM_RAG [DEBUG] [search_files] Start of deduplication. Total results: 520 [file=search_files.py:167]
+[2025-07-04 13:49:13] AI_DM_RAG [DEBUG] [search_files] Starting reranking of unique results... [file=search_files.py:176]
+[2025-07-04 13:49:37] AI_DM_RAG [DEBUG] [search_files] Top reranked results with confidence scores: [file=search_files.py:187]
+[2025-07-04 13:49:37] AI_DM_RAG [INFO] [search_files] 1. [Score: 0.9934] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 13:49:37] AI_DM_RAG [DEBUG] [search_files]    WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or...
+ [file=search_files.py:190]
+[2025-07-04 13:49:37] AI_DM_RAG [INFO] [search_files] 2. [Score: 0.9856] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 13:49:37] AI_DM_RAG [DEBUG] [search_files]    FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at th...
+ [file=search_files.py:190]
+[2025-07-04 13:49:37] AI_DM_RAG [INFO] [search_files] 3. [Score: 0.8955] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 13:49:37] AI_DM_RAG [DEBUG] [search_files]    WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick...
+ [file=search_files.py:190]
+[2025-07-04 13:49:37] AI_DM_RAG [INFO] [search_files] Top score: 0.9934 (threshold: 0.5) [file=search_files.py:203]
+[2025-07-04 13:49:37] AI_DM_RAG [DEBUG] [search_files] Reranked results: [({'text': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.', 'headings': None, 'score': 0.7391259074211121, 'formatted': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.'}, np.float32(0.9934412)), ({'text': 'FLOW OF THE GAME\nDaggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.\nPLAYER PRINCIPLES & BEST PRACTICES\nTo get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:\nPRINCIPLES\nï¿½ Be a fan of your character and their journey.\nï¿½ Spotlight your friends.\nï¿½ Address the characters and address the players.\nï¿½ Build the world together.\nï¿½ Play to find out what happens.\nï¿½ Hold on gently.\nBEST PRACTICES\nï¿½ Embrace danger.\nï¿½ Use your resources.\nï¿½ Tell the story.\nï¿½ Discover your character.\nFor more information, see the Daggerheart Core Rulebook, pages 9 and 108.', 'headings': None, 'score': 0.6757768392562866, 'formatted': 'FLOW OF THE GAME\nDaggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.\nPLAYER PRINCIPLES & BEST PRACTICES\nTo get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:\nPRINCIPLES\nï¿½ Be a fan of your character and their journey.\nï¿½ Spotlight your friends.\nï¿½ Address the characters and address the players.\nï¿½ Build the world together.\nï¿½ Play to find out what happens.\nï¿½ Hold on gently.\nBEST PRACTICES\nï¿½ Embrace danger.\nï¿½ Use your resources.\nï¿½ Tell the story.\nï¿½ Discover your character.\nFor more information, see the Daggerheart Core Rulebook, pages 9 and 108.'}, np.float32(0.985603)), ({'text': 'WHAT IS THIS?\nThis is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.\nYou can use this SRD in several ways:\nï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.\nï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.\nï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).\nï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.\nIn short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!\nTHE BASICS', 'headings': None, 'score': 0.7074531316757202, 'formatted': 'WHAT IS THIS?\nThis is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.\nYou can use this SRD in several ways:\nï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.\nï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.\nï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).\nï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.\nIn short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!\nTHE BASICS'}, np.float32(0.8955001))] [file=search_files.py:204]
+[2025-07-04 13:49:37] AI_DM_RAG [DEBUG] [search_files] Formatted prompt for Ollama:
+You are an expert RPG assistant.
+1. [Score: 0.9934] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+2. [Score: 0.9856] []
+FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.
+PLAYER PRINCIPLES & BEST PRACTICES
+To get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:
+PRINCIPLES
+ï¿½ Be a fan of your character and their journey.
+ï¿½ Spotlight your friends.
+ï¿½ Address the characters and address the players.
+ï¿½ Build the world together.
+ï¿½ Play to find out what happens.
+ï¿½ Hold on gently.
+BEST PRACTICES
+ï¿½ Embrace danger.
+ï¿½ Use your resources.
+ï¿½ Tell the story.
+ï¿½ Discover your character.
+For more information, see the Daggerheart Core Rulebook, pages 9 and 108.
+
+3. [Score: 0.8955] []
+WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.
+You can use this SRD in several ways:
+ï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.
+ï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.
+ï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).
+ï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.
+In short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!
+THE BASICS
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+User's question: "What is daggerheart?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:120]
+[2025-07-04 13:49:37] AI_DM_RAG [INFO] [search_files] 
+--- Prompt sent to Ollama ---
+ [file=search_files.py:126]
+[2025-07-04 13:49:37] AI_DM_RAG [INFO] [search_files] You are an expert RPG assistant.
+1. [Score: 0.9934] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+2. [Score: 0.9856] []
+FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.
+PLAYER PRINCIPLES & BEST PRACTICES
+To get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:
+PRINCIPLES
+ï¿½ Be a fan of your character and their journey.
+ï¿½ Spotlight your friends.
+ï¿½ Address the characters and address the players.
+ï¿½ Build the world together.
+ï¿½ Play to find out what happens.
+ï¿½ Hold on gently.
+BEST PRACTICES
+ï¿½ Embrace danger.
+ï¿½ Use your resources.
+ï¿½ Tell the story.
+ï¿½ Discover your character.
+For more information, see the Daggerheart Core Rulebook, pages 9 and 108.
+
+3. [Score: 0.8955] []
+WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.
+You can use this SRD in several ways:
+ï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.
+ï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.
+ï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).
+ï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.
+In short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!
+THE BASICS
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+User's question: "What is daggerheart?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:127]
+[2025-07-04 13:49:37] AI_DM_RAG [INFO] [search_files] 
+--- End of prompt ---
+ [file=search_files.py:128]
+[2025-07-04 13:49:37] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): localhost:11434 [file=connectionpool.py:241]
+[2025-07-04 13:49:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://localhost:11434 "POST /api/generate HTTP/1.1" 200 None [file=connectionpool.py:544]
+[2025-07-04 13:49:42] AI_DM_RAG [DEBUG] [__main__] Answer: Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.
+
+According to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.
+
+I'm confident in my answer, with a score of 0.9934 from section 1. [file=dungeon_master_api.py:75]
+[2025-07-04 13:49:42] AI_DM_RAG [DEBUG] [__main__] Used Knowledge Bases: ['core_rules', 'adversaries', 'environments', 'domain_card_reference'] [file=dungeon_master_api.py:76]
+[2025-07-04 13:49:42] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:49:42] "POST /api/v1.0/hybrid_search HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:49:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://127.0.0.1:5001 "POST /api/v1.0/hybrid_search HTTP/1.1" 200 793 [file=connectionpool.py:544]
+[2025-07-04 13:49:42] AI_DM_RAG [DEBUG] [__main__] DM API request payload: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}], ['core_rules', 'adversaries', 'environments', 'domain_card_reference'] [file=chatbox_server.py:34]
+[2025-07-04 13:49:42] AI_DM_RAG [DEBUG] [__main__] DM API request URL: http://127.0.0.1:5001/api/v1.0/hybrid_search [file=chatbox_server.py:35]
+[2025-07-04 13:49:42] AI_DM_RAG [INFO] [__main__] DM API response status: 200 [file=chatbox_server.py:36]
+[2025-07-04 13:49:42] AI_DM_RAG [DEBUG] [__main__] DM API response content: {
+  "response": "Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.\n\nAccording to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.\n\nI'm confident in my answer, with a score of 0.9934 from section 1.",
+  "success": true,
+  "used_kbs": [
+    "core_rules",
+    "adversaries",
+    "environments",
+    "domain_card_reference"
+  ]
+}
+ [file=chatbox_server.py:37]
+[2025-07-04 13:49:42] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:49:42] "POST /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:50:54] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:50:54] "OPTIONS /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:50:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): 127.0.0.1:5001 [file=connectionpool.py:241]
+[2025-07-04 13:50:55] AI_DM_RAG [DEBUG] [__main__] Received request for hybrid search [file=dungeon_master_api.py:59]
+[2025-07-04 13:50:55] AI_DM_RAG [DEBUG] [__main__] History: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}, {'role': 'assistant', 'content': "Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.\n\nAccording to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.\n\nI'm confident in my answer, with a score of 0.9934 from section 1."}, {'role': 'user', 'content': 'What are the duality dice'}] [file=dungeon_master_api.py:63]
+[2025-07-04 13:50:55] AI_DM_RAG [DEBUG] [__main__] Knowledge Bases: ['core_rules', 'adversaries', 'environments', 'domain_card_reference'] [file=dungeon_master_api.py:64]
+[2025-07-04 13:50:55] AI_DM_RAG [DEBUG] [__main__] User query: What are the duality dice [file=dungeon_master_api.py:66]
+[2025-07-04 13:50:55] AI_DM_RAG [DEBUG] [search_files] Starting parallel search for 72 queries across 4 KBs... [file=search_files.py:161]
+[2025-07-04 13:50:57] AI_DM_RAG [DEBUG] [search_files] Start of deduplication. Total results: 720 [file=search_files.py:167]
+[2025-07-04 13:50:57] AI_DM_RAG [DEBUG] [search_files] Starting reranking of unique results... [file=search_files.py:176]
+[2025-07-04 13:51:23] AI_DM_RAG [DEBUG] [search_files] Top reranked results with confidence scores: [file=search_files.py:187]
+[2025-07-04 13:51:23] AI_DM_RAG [INFO] [search_files] 1. [Score: 0.9433] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 13:51:23] AI_DM_RAG [DEBUG] [search_files]    ACTION ROLLS
+Any move where success would be trivial or failure would be boring automatically succeeds, but any move thatï¿½s difficult to accomplish or risky to attempt triggers an action roll.
+OVERV...
+ [file=search_files.py:190]
+[2025-07-04 13:51:23] AI_DM_RAG [INFO] [search_files] 2. [Score: 0.7363] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 13:51:23] AI_DM_RAG [DEBUG] [search_files]    WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or...
+ [file=search_files.py:190]
+[2025-07-04 13:51:23] AI_DM_RAG [INFO] [search_files] Top score: 0.9433 (threshold: 0.5) [file=search_files.py:203]
+[2025-07-04 13:51:23] AI_DM_RAG [DEBUG] [search_files] Reranked results: [({'text': 'ACTION ROLLS\nAny move where success would be trivial or failure would be boring automatically succeeds, but any move thatï¿½s difficult to accomplish or risky to attempt triggers an action roll.\nOVERVIEW\nAll action rolls require a pair of d12s called Duality Dice. These are two visually distinct twelve-sided dice, with one die representing Hope and the other representing Fear.\nTo make an action roll, you roll the Duality Dice, sum the results, apply any relevant modifiers, and compare the total to a Difficulty number to determine the outcome:\nï¿½ Success with Hope: If your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a ï¿½Success with Hope.ï¿½ You succeed and gain a Hope.\nï¿½ Success with Fear: If your total meets or beats the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a ï¿½Success with Fear.ï¿½ You succeed with a cost or complication, but the GM gains a Fear.\nï¿½ Failure with Hope: If your total is less than the Difficulty \nAND your Hope Die shows a higher result than your Fear Die, you rolled a ï¿½Failure with Hope.ï¿½ You fail with a minor consequence and gain a Hope, then the spotlight swings to the GM.\nï¿½ Failure with Fear: If your total is less than the Difficulty \nAND your Fear Die shows a higher result than your Hope Die, you rolled a ï¿½Failure with Fear.ï¿½ You fail with a major consequence and the GM gains a Fear, then the spotlight swings to the GM.\nï¿½ Critical Success: If the Duality Dice show matching results, you rolled a ï¿½Critical Successï¿½ (ï¿½Critï¿½). You automatically succeed with a bonus, gain a Hope, and clear a Stress. If this was an attack roll, you deal critical damage. \n\tNote: A Critical Success counts as a roll ï¿½with Hope.ï¿½\nAfter resolving the action roll, the table works together to weave the outcome into the narrative and play continues.\n\tFAILING FORWARD\nIn Daggerheart, every time you roll the dice, the scene changes in some way. There is no such thing as a roll where ï¿½nothing happens,ï¿½ because the fiction constantly evolves based on the successes and failures of the characters.', 'headings': None, 'score': 0.7054773569107056, 'formatted': 'ACTION ROLLS\nAny move where success would be trivial or failure would be boring automatically succeeds, but any move thatï¿½s difficult to accomplish or risky to attempt triggers an action roll.\nOVERVIEW\nAll action rolls require a pair of d12s called Duality Dice. These are two visually distinct twelve-sided dice, with one die representing Hope and the other representing Fear.\nTo make an action roll, you roll the Duality Dice, sum the results, apply any relevant modifiers, and compare the total to a Difficulty number to determine the outcome:\nï¿½ Success with Hope: If your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a ï¿½Success with Hope.ï¿½ You succeed and gain a Hope.\nï¿½ Success with Fear: If your total meets or beats the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a ï¿½Success with Fear.ï¿½ You succeed with a cost or complication, but the GM gains a Fear.\nï¿½ Failure with Hope: If your total is less than the Difficulty \nAND your Hope Die shows a higher result than your Fear Die, you rolled a ï¿½Failure with Hope.ï¿½ You fail with a minor consequence and gain a Hope, then the spotlight swings to the GM.\nï¿½ Failure with Fear: If your total is less than the Difficulty \nAND your Fear Die shows a higher result than your Hope Die, you rolled a ï¿½Failure with Fear.ï¿½ You fail with a major consequence and the GM gains a Fear, then the spotlight swings to the GM.\nï¿½ Critical Success: If the Duality Dice show matching results, you rolled a ï¿½Critical Successï¿½ (ï¿½Critï¿½). You automatically succeed with a bonus, gain a Hope, and clear a Stress. If this was an attack roll, you deal critical damage. \n\tNote: A Critical Success counts as a roll ï¿½with Hope.ï¿½\nAfter resolving the action roll, the table works together to weave the outcome into the narrative and play continues.\n\tFAILING FORWARD\nIn Daggerheart, every time you roll the dice, the scene changes in some way. There is no such thing as a roll where ï¿½nothing happens,ï¿½ because the fiction constantly evolves based on the successes and failures of the characters.'}, np.float32(0.9432901)), ({'text': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.', 'headings': None, 'score': 0.59420245885849, 'formatted': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.'}, np.float32(0.73625416))] [file=search_files.py:204]
+[2025-07-04 13:51:23] AI_DM_RAG [DEBUG] [search_files] Formatted prompt for Ollama:
+You are an expert RPG assistant.
+1. [Score: 0.9433] []
+ACTION ROLLS
+Any move where success would be trivial or failure would be boring automatically succeeds, but any move thatï¿½s difficult to accomplish or risky to attempt triggers an action roll.
+OVERVIEW
+All action rolls require a pair of d12s called Duality Dice. These are two visually distinct twelve-sided dice, with one die representing Hope and the other representing Fear.
+To make an action roll, you roll the Duality Dice, sum the results, apply any relevant modifiers, and compare the total to a Difficulty number to determine the outcome:
+ï¿½ Success with Hope: If your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a ï¿½Success with Hope.ï¿½ You succeed and gain a Hope.
+ï¿½ Success with Fear: If your total meets or beats the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a ï¿½Success with Fear.ï¿½ You succeed with a cost or complication, but the GM gains a Fear.
+ï¿½ Failure with Hope: If your total is less than the Difficulty 
+AND your Hope Die shows a higher result than your Fear Die, you rolled a ï¿½Failure with Hope.ï¿½ You fail with a minor consequence and gain a Hope, then the spotlight swings to the GM.
+ï¿½ Failure with Fear: If your total is less than the Difficulty 
+AND your Fear Die shows a higher result than your Hope Die, you rolled a ï¿½Failure with Fear.ï¿½ You fail with a major consequence and the GM gains a Fear, then the spotlight swings to the GM.
+ï¿½ Critical Success: If the Duality Dice show matching results, you rolled a ï¿½Critical Successï¿½ (ï¿½Critï¿½). You automatically succeed with a bonus, gain a Hope, and clear a Stress. If this was an attack roll, you deal critical damage. 
+	Note: A Critical Success counts as a roll ï¿½with Hope.ï¿½
+After resolving the action roll, the table works together to weave the outcome into the narrative and play continues.
+	FAILING FORWARD
+In Daggerheart, every time you roll the dice, the scene changes in some way. There is no such thing as a roll where ï¿½nothing happens,ï¿½ because the fiction constantly evolves based on the successes and failures of the characters.
+
+2. [Score: 0.7363] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+Assistant: Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.
+
+According to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.
+
+I'm confident in my answer, with a score of 0.9934 from section 1.
+User: What are the duality dice
+User's question: "What are the duality dice"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:120]
+[2025-07-04 13:51:23] AI_DM_RAG [INFO] [search_files] 
+--- Prompt sent to Ollama ---
+ [file=search_files.py:126]
+[2025-07-04 13:51:23] AI_DM_RAG [INFO] [search_files] You are an expert RPG assistant.
+1. [Score: 0.9433] []
+ACTION ROLLS
+Any move where success would be trivial or failure would be boring automatically succeeds, but any move thatï¿½s difficult to accomplish or risky to attempt triggers an action roll.
+OVERVIEW
+All action rolls require a pair of d12s called Duality Dice. These are two visually distinct twelve-sided dice, with one die representing Hope and the other representing Fear.
+To make an action roll, you roll the Duality Dice, sum the results, apply any relevant modifiers, and compare the total to a Difficulty number to determine the outcome:
+ï¿½ Success with Hope: If your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a ï¿½Success with Hope.ï¿½ You succeed and gain a Hope.
+ï¿½ Success with Fear: If your total meets or beats the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a ï¿½Success with Fear.ï¿½ You succeed with a cost or complication, but the GM gains a Fear.
+ï¿½ Failure with Hope: If your total is less than the Difficulty 
+AND your Hope Die shows a higher result than your Fear Die, you rolled a ï¿½Failure with Hope.ï¿½ You fail with a minor consequence and gain a Hope, then the spotlight swings to the GM.
+ï¿½ Failure with Fear: If your total is less than the Difficulty 
+AND your Fear Die shows a higher result than your Hope Die, you rolled a ï¿½Failure with Fear.ï¿½ You fail with a major consequence and the GM gains a Fear, then the spotlight swings to the GM.
+ï¿½ Critical Success: If the Duality Dice show matching results, you rolled a ï¿½Critical Successï¿½ (ï¿½Critï¿½). You automatically succeed with a bonus, gain a Hope, and clear a Stress. If this was an attack roll, you deal critical damage. 
+	Note: A Critical Success counts as a roll ï¿½with Hope.ï¿½
+After resolving the action roll, the table works together to weave the outcome into the narrative and play continues.
+	FAILING FORWARD
+In Daggerheart, every time you roll the dice, the scene changes in some way. There is no such thing as a roll where ï¿½nothing happens,ï¿½ because the fiction constantly evolves based on the successes and failures of the characters.
+
+2. [Score: 0.7363] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+Assistant: Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.
+
+According to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.
+
+I'm confident in my answer, with a score of 0.9934 from section 1.
+User: What are the duality dice
+User's question: "What are the duality dice"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:127]
+[2025-07-04 13:51:23] AI_DM_RAG [INFO] [search_files] 
+--- End of prompt ---
+ [file=search_files.py:128]
+[2025-07-04 13:51:23] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): localhost:11434 [file=connectionpool.py:241]
+[2025-07-04 13:51:28] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://localhost:11434 "POST /api/generate HTTP/1.1" 200 None [file=connectionpool.py:544]
+[2025-07-04 13:51:28] AI_DM_RAG [DEBUG] [__main__] Answer: The Duality Dice! According to Section 1, Action Rolls, the Duality Dice are two visually distinct twelve-sided dice called "Duality Dice." These dice represent Hope and Fear.
+
+In Daggerheart, when a player makes an action roll, they use these Duality Dice to determine the outcome of their action. The dice are rolled, summed together, and then compared to a Difficulty number set by the GM (Game Master). This mechanic is used throughout the game to drive the story forward and create a dynamic experience for players.
+
+To recall, if your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a "Success with Hope." On the other hand, if your total is less than the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a "Failure with Fear."
+
+I'm confident in my answer, with a score of 0.9433 from Section 1. [file=dungeon_master_api.py:75]
+[2025-07-04 13:51:28] AI_DM_RAG [DEBUG] [__main__] Used Knowledge Bases: ['core_rules', 'adversaries', 'environments', 'domain_card_reference'] [file=dungeon_master_api.py:76]
+[2025-07-04 13:51:28] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:51:28] "POST /api/v1.0/hybrid_search HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:51:28] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://127.0.0.1:5001 "POST /api/v1.0/hybrid_search HTTP/1.1" 200 1051 [file=connectionpool.py:544]
+[2025-07-04 13:51:28] AI_DM_RAG [DEBUG] [__main__] DM API request payload: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}, {'role': 'assistant', 'content': "Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.\n\nAccording to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.\n\nI'm confident in my answer, with a score of 0.9934 from section 1."}, {'role': 'user', 'content': 'What are the duality dice'}], ['core_rules', 'adversaries', 'environments', 'domain_card_reference'] [file=chatbox_server.py:34]
+[2025-07-04 13:51:28] AI_DM_RAG [DEBUG] [__main__] DM API request URL: http://127.0.0.1:5001/api/v1.0/hybrid_search [file=chatbox_server.py:35]
+[2025-07-04 13:51:28] AI_DM_RAG [INFO] [__main__] DM API response status: 200 [file=chatbox_server.py:36]
+[2025-07-04 13:51:28] AI_DM_RAG [DEBUG] [__main__] DM API response content: {
+  "response": "The Duality Dice! According to Section 1, Action Rolls, the Duality Dice are two visually distinct twelve-sided dice called \"Duality Dice.\" These dice represent Hope and Fear.\n\nIn Daggerheart, when a player makes an action roll, they use these Duality Dice to determine the outcome of their action. The dice are rolled, summed together, and then compared to a Difficulty number set by the GM (Game Master). This mechanic is used throughout the game to drive the story forward and create a dynamic experience for players.\n\nTo recall, if your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a \"Success with Hope.\" On the other hand, if your total is less than the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a \"Failure with Fear.\"\n\nI'm confident in my answer, with a score of 0.9433 from Section 1.",
+  "success": true,
+  "used_kbs": [
+    "core_rules",
+    "adversaries",
+    "environments",
+    "domain_card_reference"
+  ]
+}
+ [file=chatbox_server.py:37]
+[2025-07-04 13:51:28] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:51:28] "POST /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:55:39] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:55:39] "OPTIONS /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:55:39] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): 127.0.0.1:5001 [file=connectionpool.py:241]
+[2025-07-04 13:55:39] AI_DM_RAG [DEBUG] [__main__] Received request for hybrid search [file=dungeon_master_api.py:59]
+[2025-07-04 13:55:39] AI_DM_RAG [DEBUG] [__main__] History: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}, {'role': 'assistant', 'content': "Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.\n\nAccording to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.\n\nI'm confident in my answer, with a score of 0.9934 from section 1."}, {'role': 'user', 'content': 'What are the duality dice'}, {'role': 'assistant', 'content': 'The Duality Dice! According to Section 1, Action Rolls, the Duality Dice are two visually distinct twelve-sided dice called "Duality Dice." These dice represent Hope and Fear.\n\nIn Daggerheart, when a player makes an action roll, they use these Duality Dice to determine the outcome of their action. The dice are rolled, summed together, and then compared to a Difficulty number set by the GM (Game Master). This mechanic is used throughout the game to drive the story forward and create a dynamic experience for players.\n\nTo recall, if your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a "Success with Hope." On the other hand, if your total is less than the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a "Failure with Fear."\n\nI\'m confident in my answer, with a score of 0.9433 from Section 1.'}, {'role': 'user', 'content': 'What is a good metric for difficulty rating?'}] [file=dungeon_master_api.py:63]
+[2025-07-04 13:55:39] AI_DM_RAG [DEBUG] [__main__] Knowledge Bases: ['core_rules'] [file=dungeon_master_api.py:64]
+[2025-07-04 13:55:39] AI_DM_RAG [DEBUG] [__main__] User query: What is a good metric for difficulty rating? [file=dungeon_master_api.py:66]
+[2025-07-04 13:55:39] AI_DM_RAG [DEBUG] [search_files] Starting parallel search for 67 queries across 1 KBs... [file=search_files.py:161]
+[2025-07-04 13:55:41] AI_DM_RAG [DEBUG] [search_files] Start of deduplication. Total results: 670 [file=search_files.py:167]
+[2025-07-04 13:55:41] AI_DM_RAG [DEBUG] [search_files] Starting reranking of unique results... [file=search_files.py:176]
+[2025-07-04 13:55:53] AI_DM_RAG [DEBUG] [search_files] Top reranked results with confidence scores: [file=search_files.py:187]
+[2025-07-04 13:55:53] AI_DM_RAG [INFO] [search_files] No reranked results above threshold. [file=search_files.py:200]
+[2025-07-04 13:55:53] AI_DM_RAG [INFO] [search_files] Top score: 0.0000 (threshold: 0.5) [file=search_files.py:203]
+[2025-07-04 13:55:53] AI_DM_RAG [DEBUG] [search_files] Reranked results: [] [file=search_files.py:204]
+[2025-07-04 13:55:53] AI_DM_RAG [DEBUG] [search_files] Formatted prompt for Ollama:
+You are an expert RPG assistant.
+
+WARNING: No high-confidence matches found. Please try to be more specific in your question.
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+Assistant: Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.
+
+According to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.
+
+I'm confident in my answer, with a score of 0.9934 from section 1.
+User: What are the duality dice
+Assistant: The Duality Dice! According to Section 1, Action Rolls, the Duality Dice are two visually distinct twelve-sided dice called "Duality Dice." These dice represent Hope and Fear.
+
+In Daggerheart, when a player makes an action roll, they use these Duality Dice to determine the outcome of their action. The dice are rolled, summed together, and then compared to a Difficulty number set by the GM (Game Master). This mechanic is used throughout the game to drive the story forward and create a dynamic experience for players.
+
+To recall, if your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a "Success with Hope." On the other hand, if your total is less than the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a "Failure with Fear."
+
+I'm confident in my answer, with a score of 0.9433 from Section 1.
+User: What is a good metric for difficulty rating?
+User's question: "What is a good metric for difficulty rating?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:120]
+[2025-07-04 13:55:53] AI_DM_RAG [INFO] [search_files] 
+--- Prompt sent to Ollama ---
+ [file=search_files.py:126]
+[2025-07-04 13:55:53] AI_DM_RAG [INFO] [search_files] You are an expert RPG assistant.
+
+WARNING: No high-confidence matches found. Please try to be more specific in your question.
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+Assistant: Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.
+
+According to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.
+
+I'm confident in my answer, with a score of 0.9934 from section 1.
+User: What are the duality dice
+Assistant: The Duality Dice! According to Section 1, Action Rolls, the Duality Dice are two visually distinct twelve-sided dice called "Duality Dice." These dice represent Hope and Fear.
+
+In Daggerheart, when a player makes an action roll, they use these Duality Dice to determine the outcome of their action. The dice are rolled, summed together, and then compared to a Difficulty number set by the GM (Game Master). This mechanic is used throughout the game to drive the story forward and create a dynamic experience for players.
+
+To recall, if your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a "Success with Hope." On the other hand, if your total is less than the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a "Failure with Fear."
+
+I'm confident in my answer, with a score of 0.9433 from Section 1.
+User: What is a good metric for difficulty rating?
+User's question: "What is a good metric for difficulty rating?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:127]
+[2025-07-04 13:55:53] AI_DM_RAG [INFO] [search_files] 
+--- End of prompt ---
+ [file=search_files.py:128]
+[2025-07-04 13:55:53] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): localhost:11434 [file=connectionpool.py:241]
+[2025-07-04 13:55:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://localhost:11434 "POST /api/generate HTTP/1.1" 200 None [file=connectionpool.py:544]
+[2025-07-04 13:55:57] AI_DM_RAG [DEBUG] [__main__] Answer: 
+WARNING: No high-confidence matches found. Please try to be more specific in your question.
+The Duality Dice mechanics are crucial in Daggerheart! According to Section 1, Action Rolls, when determining Difficulty ratings, there isn't a specific metric mentioned. However, it's implied that the Game Master (GM) sets the Difficulty number based on their judgment of the situation.
+
+In practical terms, you can think of the Difficulty rating as a measure of how challenging or daunting the task is for your character. The GM might consider factors like the character's skills and abilities, the environment they're in, and the stakes involved when setting the Difficulty.
+
+As there isn't a specific metric provided, I'll rely on my understanding of the game mechanics and the context. Feel free to share more details or clarify any doubts you may have!
+
+Confidence score: 0.9433 (Section 1: Action Rolls) [file=dungeon_master_api.py:75]
+[2025-07-04 13:55:57] AI_DM_RAG [DEBUG] [__main__] Used Knowledge Bases: ['core_rules'] [file=dungeon_master_api.py:76]
+[2025-07-04 13:55:57] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:55:57] "POST /api/v1.0/hybrid_search HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 13:55:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://127.0.0.1:5001 "POST /api/v1.0/hybrid_search HTTP/1.1" 200 989 [file=connectionpool.py:544]
+[2025-07-04 13:55:57] AI_DM_RAG [DEBUG] [__main__] DM API request payload: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}, {'role': 'assistant', 'content': "Daggerheart is a tabletop roleplaying game designed for 2-5 players and one Game Master (GM). It's a conversation-based game where the GM describes scenarios, and players take turns describing their characters' reactions. The goal is to build upon each other's ideas and tell a collaborative story.\n\nAccording to section 1, Daggerheart can be played as a one-shot or a multi-session campaign, with each session lasting about 2-4 hours. The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions.\n\nI'm confident in my answer, with a score of 0.9934 from section 1."}, {'role': 'user', 'content': 'What are the duality dice'}, {'role': 'assistant', 'content': 'The Duality Dice! According to Section 1, Action Rolls, the Duality Dice are two visually distinct twelve-sided dice called "Duality Dice." These dice represent Hope and Fear.\n\nIn Daggerheart, when a player makes an action roll, they use these Duality Dice to determine the outcome of their action. The dice are rolled, summed together, and then compared to a Difficulty number set by the GM (Game Master). This mechanic is used throughout the game to drive the story forward and create a dynamic experience for players.\n\nTo recall, if your total meets or beats the Difficulty AND your Hope Die shows a higher result than your Fear Die, you rolled a "Success with Hope." On the other hand, if your total is less than the Difficulty AND your Fear Die shows a higher result than your Hope Die, you rolled a "Failure with Fear."\n\nI\'m confident in my answer, with a score of 0.9433 from Section 1.'}, {'role': 'user', 'content': 'What is a good metric for difficulty rating?'}], ['core_rules'] [file=chatbox_server.py:34]
+[2025-07-04 13:55:57] AI_DM_RAG [DEBUG] [__main__] DM API request URL: http://127.0.0.1:5001/api/v1.0/hybrid_search [file=chatbox_server.py:35]
+[2025-07-04 13:55:57] AI_DM_RAG [INFO] [__main__] DM API response status: 200 [file=chatbox_server.py:36]
+[2025-07-04 13:55:57] AI_DM_RAG [DEBUG] [__main__] DM API response content: {
+  "response": "\nWARNING: No high-confidence matches found. Please try to be more specific in your question.\nThe Duality Dice mechanics are crucial in Daggerheart! According to Section 1, Action Rolls, when determining Difficulty ratings, there isn't a specific metric mentioned. However, it's implied that the Game Master (GM) sets the Difficulty number based on their judgment of the situation.\n\nIn practical terms, you can think of the Difficulty rating as a measure of how challenging or daunting the task is for your character. The GM might consider factors like the character's skills and abilities, the environment they're in, and the stakes involved when setting the Difficulty.\n\nAs there isn't a specific metric provided, I'll rely on my understanding of the game mechanics and the context. Feel free to share more details or clarify any doubts you may have!\n\nConfidence score: 0.9433 (Section 1: Action Rolls)",
+  "success": true,
+  "used_kbs": [
+    "core_rules"
+  ]
+}
+ [file=chatbox_server.py:37]
+[2025-07-04 13:55:57] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 13:55:57] "POST /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 14:10:13] AI_DM_RAG [INFO] [werkzeug]  * Detected change in 'D:\\git\\AI-DM-Helper\\search_files.py', reloading [file=_internal.py:97]
+[2025-07-04 14:10:13] AI_DM_RAG [INFO] [werkzeug]  * Restarting with stat [file=_internal.py:97]
+[2025-07-04 14:10:13] AI_DM_RAG [WARNING] [werkzeug]  * Debugger is active! [file=_internal.py:97]
+[2025-07-04 14:10:13] AI_DM_RAG [INFO] [werkzeug]  * Debugger PIN: 133-217-281 [file=_internal.py:97]
+[2025-07-04 14:10:22] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 14:10:22] "OPTIONS /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 14:10:22] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): 127.0.0.1:5001 [file=connectionpool.py:241]
+[2025-07-04 14:10:22] AI_DM_RAG [DEBUG] [__main__] Received request for hybrid search [file=dungeon_master_api.py:59]
+[2025-07-04 14:10:22] AI_DM_RAG [DEBUG] [__main__] History: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}] [file=dungeon_master_api.py:63]
+[2025-07-04 14:10:22] AI_DM_RAG [DEBUG] [__main__] Knowledge Bases: ['core_rules'] [file=dungeon_master_api.py:64]
+[2025-07-04 14:10:22] AI_DM_RAG [DEBUG] [__main__] User query: What is daggerheart? [file=dungeon_master_api.py:66]
+[2025-07-04 14:10:22] AI_DM_RAG [DEBUG] [search_files] Starting parallel search for 13 queries across 1 KBs... [file=search_files.py:161]
+[2025-07-04 14:10:22] AI_DM_RAG [DEBUG] [search_files] Start of deduplication. Total results: 130 [file=search_files.py:167]
+[2025-07-04 14:10:22] AI_DM_RAG [DEBUG] [search_files] Starting reranking of unique results... [file=search_files.py:176]
+[2025-07-04 14:10:27] AI_DM_RAG [DEBUG] [search_files] Top reranked results with confidence scores: [file=search_files.py:187]
+[2025-07-04 14:10:27] AI_DM_RAG [INFO] [search_files] 1. [Score: 0.9934] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 14:10:27] AI_DM_RAG [DEBUG] [search_files]    WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or...
+ [file=search_files.py:190]
+[2025-07-04 14:10:27] AI_DM_RAG [INFO] [search_files] 2. [Score: 0.9856] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 14:10:27] AI_DM_RAG [DEBUG] [search_files]    FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at th...
+ [file=search_files.py:190]
+[2025-07-04 14:10:27] AI_DM_RAG [INFO] [search_files] 3. [Score: 0.8955] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 14:10:27] AI_DM_RAG [DEBUG] [search_files]    WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick...
+ [file=search_files.py:190]
+[2025-07-04 14:10:27] AI_DM_RAG [INFO] [search_files] Top score: 0.9934 (threshold: 0.5) [file=search_files.py:203]
+[2025-07-04 14:10:27] AI_DM_RAG [DEBUG] [search_files] Reranked results: [({'text': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.', 'headings': None, 'score': 0.7407288551330566, 'formatted': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.'}, np.float32(0.9934412)), ({'text': 'FLOW OF THE GAME\nDaggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.\nPLAYER PRINCIPLES & BEST PRACTICES\nTo get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:\nPRINCIPLES\nï¿½ Be a fan of your character and their journey.\nï¿½ Spotlight your friends.\nï¿½ Address the characters and address the players.\nï¿½ Build the world together.\nï¿½ Play to find out what happens.\nï¿½ Hold on gently.\nBEST PRACTICES\nï¿½ Embrace danger.\nï¿½ Use your resources.\nï¿½ Tell the story.\nï¿½ Discover your character.\nFor more information, see the Daggerheart Core Rulebook, pages 9 and 108.', 'headings': None, 'score': 0.6910151243209839, 'formatted': 'FLOW OF THE GAME\nDaggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.\nPLAYER PRINCIPLES & BEST PRACTICES\nTo get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:\nPRINCIPLES\nï¿½ Be a fan of your character and their journey.\nï¿½ Spotlight your friends.\nï¿½ Address the characters and address the players.\nï¿½ Build the world together.\nï¿½ Play to find out what happens.\nï¿½ Hold on gently.\nBEST PRACTICES\nï¿½ Embrace danger.\nï¿½ Use your resources.\nï¿½ Tell the story.\nï¿½ Discover your character.\nFor more information, see the Daggerheart Core Rulebook, pages 9 and 108.'}, np.float32(0.985603)), ({'text': 'WHAT IS THIS?\nThis is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.\nYou can use this SRD in several ways:\nï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.\nï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.\nï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).\nï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.\nIn short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!\nTHE BASICS', 'headings': None, 'score': 0.7367249727249146, 'formatted': 'WHAT IS THIS?\nThis is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.\nYou can use this SRD in several ways:\nï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.\nï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.\nï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).\nï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.\nIn short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!\nTHE BASICS'}, np.float32(0.8955001))] [file=search_files.py:204]
+[2025-07-04 14:10:27] AI_DM_RAG [DEBUG] [search_files] Formatted prompt for Ollama:
+You are an expert RPG assistant.
+1. [Score: 0.9934] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+2. [Score: 0.9856] []
+FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.
+PLAYER PRINCIPLES & BEST PRACTICES
+To get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:
+PRINCIPLES
+ï¿½ Be a fan of your character and their journey.
+ï¿½ Spotlight your friends.
+ï¿½ Address the characters and address the players.
+ï¿½ Build the world together.
+ï¿½ Play to find out what happens.
+ï¿½ Hold on gently.
+BEST PRACTICES
+ï¿½ Embrace danger.
+ï¿½ Use your resources.
+ï¿½ Tell the story.
+ï¿½ Discover your character.
+For more information, see the Daggerheart Core Rulebook, pages 9 and 108.
+
+3. [Score: 0.8955] []
+WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.
+You can use this SRD in several ways:
+ï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.
+ï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.
+ï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).
+ï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.
+In short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!
+THE BASICS
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+User's question: "What is daggerheart?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:120]
+[2025-07-04 14:10:27] AI_DM_RAG [INFO] [search_files] 
+--- Prompt sent to Ollama ---
+ [file=search_files.py:126]
+[2025-07-04 14:10:27] AI_DM_RAG [INFO] [search_files] You are an expert RPG assistant.
+1. [Score: 0.9934] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+2. [Score: 0.9856] []
+FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.
+PLAYER PRINCIPLES & BEST PRACTICES
+To get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:
+PRINCIPLES
+ï¿½ Be a fan of your character and their journey.
+ï¿½ Spotlight your friends.
+ï¿½ Address the characters and address the players.
+ï¿½ Build the world together.
+ï¿½ Play to find out what happens.
+ï¿½ Hold on gently.
+BEST PRACTICES
+ï¿½ Embrace danger.
+ï¿½ Use your resources.
+ï¿½ Tell the story.
+ï¿½ Discover your character.
+For more information, see the Daggerheart Core Rulebook, pages 9 and 108.
+
+3. [Score: 0.8955] []
+WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.
+You can use this SRD in several ways:
+ï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.
+ï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.
+ï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).
+ï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.
+In short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!
+THE BASICS
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+User's question: "What is daggerheart?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:127]
+[2025-07-04 14:10:27] AI_DM_RAG [INFO] [search_files] 
+--- End of prompt ---
+ [file=search_files.py:128]
+[2025-07-04 14:10:27] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): localhost:11434 [file=connectionpool.py:241]
+[2025-07-04 14:10:33] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://localhost:11434 "POST /api/generate HTTP/1.1" 200 None [file=connectionpool.py:544]
+[2025-07-04 14:10:33] AI_DM_RAG [DEBUG] [__main__] Answer: Based on your conversation, I'd be happy to help.
+
+Daggerheart is a tabletop roleplaying game designed for 2-5 players, with one Game Master (GM). It's a game that focuses on collaborative storytelling, where the GM describes situations and narrates events, and the players roleplay their characters' reactions. The gameplay involves using Duality Dice, which are two differently colored 12-sided dice representing Hope and Fear. These dice help determine the outcome of actions taken by the player characters.
+
+You can find more information about Daggerheart in sections [1] (Score: 0.9934) and [2] (Score: 0.9856). [file=dungeon_master_api.py:75]
+[2025-07-04 14:10:33] AI_DM_RAG [DEBUG] [__main__] Used Knowledge Bases: ['core_rules'] [file=dungeon_master_api.py:76]
+[2025-07-04 14:10:33] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 14:10:33] "POST /api/v1.0/hybrid_search HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 14:10:33] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://127.0.0.1:5001 "POST /api/v1.0/hybrid_search HTTP/1.1" 200 698 [file=connectionpool.py:544]
+[2025-07-04 14:10:33] AI_DM_RAG [DEBUG] [__main__] DM API request payload: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}], ['core_rules'] [file=chatbox_server.py:34]
+[2025-07-04 14:10:33] AI_DM_RAG [DEBUG] [__main__] DM API request URL: http://127.0.0.1:5001/api/v1.0/hybrid_search [file=chatbox_server.py:35]
+[2025-07-04 14:10:33] AI_DM_RAG [INFO] [__main__] DM API response status: 200 [file=chatbox_server.py:36]
+[2025-07-04 14:10:33] AI_DM_RAG [DEBUG] [__main__] DM API response content: {
+  "response": "Based on your conversation, I'd be happy to help.\n\nDaggerheart is a tabletop roleplaying game designed for 2-5 players, with one Game Master (GM). It's a game that focuses on collaborative storytelling, where the GM describes situations and narrates events, and the players roleplay their characters' reactions. The gameplay involves using Duality Dice, which are two differently colored 12-sided dice representing Hope and Fear. These dice help determine the outcome of actions taken by the player characters.\n\nYou can find more information about Daggerheart in sections [1] (Score: 0.9934) and [2] (Score: 0.9856).",
+  "success": true,
+  "used_kbs": [
+    "core_rules"
+  ]
+}
+ [file=chatbox_server.py:37]
+[2025-07-04 14:10:33] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 14:10:33] "POST /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 14:11:37] AI_DM_RAG [INFO] [werkzeug]  * Detected change in 'D:\\git\\AI-DM-Helper\\search_files.py', reloading [file=_internal.py:97]
+[2025-07-04 14:11:37] AI_DM_RAG [INFO] [werkzeug]  * Restarting with stat [file=_internal.py:97]
+[2025-07-04 14:11:37] AI_DM_RAG [WARNING] [werkzeug]  * Debugger is active! [file=_internal.py:97]
+[2025-07-04 14:11:37] AI_DM_RAG [INFO] [werkzeug]  * Debugger PIN: 133-217-281 [file=_internal.py:97]
+[2025-07-04 14:11:49] AI_DM_RAG [INFO] [__main__] Starting the Dungeon Master API and Flask app... [file=main.py:14]
+[2025-07-04 14:11:50] AI_DM_RAG [INFO] [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000 [file=_internal.py:97]
+[2025-07-04 14:11:50] AI_DM_RAG [INFO] [werkzeug] [33mPress CTRL+C to quit[0m [file=_internal.py:97]
+[2025-07-04 14:11:50] AI_DM_RAG [INFO] [werkzeug]  * Restarting with stat [file=_internal.py:97]
+[2025-07-04 14:11:50] AI_DM_RAG [DEBUG] [faiss.loader] Environment variable FAISS_OPT_LEVEL is not set, so let's pick the instruction set according to the current CPU [file=loader.py:89]
+[2025-07-04 14:11:50] AI_DM_RAG [INFO] [faiss.loader] Loading faiss with AVX2 support. [file=loader.py:125]
+[2025-07-04 14:11:50] AI_DM_RAG [INFO] [faiss.loader] Successfully loaded faiss with AVX2 support. [file=loader.py:127]
+[2025-07-04 14:11:50] AI_DM_RAG [INFO] [faiss] Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss. [file=__init__.py:186]
+[2025-07-04 14:11:50] AI_DM_RAG [WARNING] [werkzeug]  * Debugger is active! [file=_internal.py:97]
+[2025-07-04 14:11:50] AI_DM_RAG [INFO] [werkzeug]  * Debugger PIN: 133-217-281 [file=_internal.py:97]
+[2025-07-04 14:11:55] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Use pytorch device_name: cpu [file=SentenceTransformer.py:211]
+[2025-07-04 14:11:55] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5 [file=SentenceTransformer.py:219]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTPS connection (1): huggingface.co:443 [file=connectionpool.py:1049]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config_sentence_transformers.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config_sentence_transformers.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/sentence_bert_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/sentence_bert_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/adapter_config.json HTTP/1.1" 404 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:55] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/revision/main HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5 HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:56] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/cross-encoder/ms-marco-electra-base/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [INFO] [sentence_transformers.cross_encoder.CrossEncoder] Use pytorch device: cpu [file=CrossEncoder.py:224]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/cross-encoder/ms-marco-electra-base HTTP/1.1" 200 2564 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Use pytorch device_name: cpu [file=SentenceTransformer.py:211]
+[2025-07-04 14:11:57] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Load pretrained SentenceTransformer: BAAI/bge-base-en-v1.5 [file=SentenceTransformer.py:219]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config_sentence_transformers.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config_sentence_transformers.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/sentence_bert_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/sentence_bert_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/adapter_config.json HTTP/1.1" 404 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:57] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-base-en-v1.5/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-base-en-v1.5/a5beb1e3e68b9ab74eb54cfd186867f64f240e1a/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64 [file=connectionpool.py:544]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5/revision/main HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-base-en-v1.5 HTTP/1.1" 200 148848 [file=connectionpool.py:544]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [__main__] Starting the Dungeon Master API Flask app... [file=dungeon_master_api.py:143]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [__main__] /static/<path:filename> [file=dungeon_master_api.py:146]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [__main__] / [file=dungeon_master_api.py:146]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [__main__] /api/v1.0/roll_dice [file=dungeon_master_api.py:146]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [__main__] /api/v1.0/hybrid_search [file=dungeon_master_api.py:146]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [__main__] /refresh_embeddings [file=dungeon_master_api.py:146]
+[2025-07-04 14:11:58] AI_DM_RAG [DEBUG] [__main__] /knowledge_bases [file=dungeon_master_api.py:146]
+[2025-07-04 14:11:58] AI_DM_RAG [INFO] [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001 [file=_internal.py:97]
+[2025-07-04 14:11:58] AI_DM_RAG [INFO] [werkzeug] [33mPress CTRL+C to quit[0m [file=_internal.py:97]
+[2025-07-04 14:12:22] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 14:12:22] "OPTIONS /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 14:12:22] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): 127.0.0.1:5001 [file=connectionpool.py:241]
+[2025-07-04 14:12:22] AI_DM_RAG [DEBUG] [__main__] Received request for hybrid search [file=dungeon_master_api.py:59]
+[2025-07-04 14:12:22] AI_DM_RAG [DEBUG] [__main__] History: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}] [file=dungeon_master_api.py:63]
+[2025-07-04 14:12:22] AI_DM_RAG [DEBUG] [__main__] Knowledge Bases: ['core_rules'] [file=dungeon_master_api.py:64]
+[2025-07-04 14:12:22] AI_DM_RAG [DEBUG] [__main__] User query: What is daggerheart? [file=dungeon_master_api.py:66]
+[2025-07-04 14:12:24] AI_DM_RAG [DEBUG] [search_files] Starting parallel search for 13 queries across 1 KBs... [file=search_files.py:161]
+[2025-07-04 14:12:24] AI_DM_RAG [DEBUG] [search_files] Start of deduplication. Total results: 130 [file=search_files.py:167]
+[2025-07-04 14:12:24] AI_DM_RAG [DEBUG] [search_files] Starting reranking of unique results: 16... [file=search_files.py:176]
+[2025-07-04 14:12:29] AI_DM_RAG [DEBUG] [search_files] Top reranked results with confidence scores: [file=search_files.py:187]
+[2025-07-04 14:12:29] AI_DM_RAG [INFO] [search_files] 1. [Score: 0.9934] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 14:12:29] AI_DM_RAG [DEBUG] [search_files]    WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or...
+ [file=search_files.py:190]
+[2025-07-04 14:12:29] AI_DM_RAG [INFO] [search_files] 2. [Score: 0.9856] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 14:12:29] AI_DM_RAG [DEBUG] [search_files]    FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at th...
+ [file=search_files.py:190]
+[2025-07-04 14:12:29] AI_DM_RAG [INFO] [search_files] 3. [Score: 0.8955] KB:  | Section: None [file=search_files.py:189]
+[2025-07-04 14:12:29] AI_DM_RAG [DEBUG] [search_files]    WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick...
+ [file=search_files.py:190]
+[2025-07-04 14:12:29] AI_DM_RAG [INFO] [search_files] Top score: 0.9934 (threshold: 0.5) [file=search_files.py:203]
+[2025-07-04 14:12:29] AI_DM_RAG [DEBUG] [search_files] Reranked results: [({'text': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.', 'headings': None, 'score': 0.7800301313400269, 'formatted': 'WHAT IS DAGGERHEART?\nDaggerheart is a tabletop roleplaying game for one Game \nMaster (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. \nDuring a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.\nWhen a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.'}, np.float32(0.9934412)), ({'text': 'FLOW OF THE GAME\nDaggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.\nPLAYER PRINCIPLES & BEST PRACTICES\nTo get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:\nPRINCIPLES\nï¿½ Be a fan of your character and their journey.\nï¿½ Spotlight your friends.\nï¿½ Address the characters and address the players.\nï¿½ Build the world together.\nï¿½ Play to find out what happens.\nï¿½ Hold on gently.\nBEST PRACTICES\nï¿½ Embrace danger.\nï¿½ Use your resources.\nï¿½ Tell the story.\nï¿½ Discover your character.\nFor more information, see the Daggerheart Core Rulebook, pages 9 and 108.', 'headings': None, 'score': 0.6974404454231262, 'formatted': 'FLOW OF THE GAME\nDaggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.\nPLAYER PRINCIPLES & BEST PRACTICES\nTo get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:\nPRINCIPLES\nï¿½ Be a fan of your character and their journey.\nï¿½ Spotlight your friends.\nï¿½ Address the characters and address the players.\nï¿½ Build the world together.\nï¿½ Play to find out what happens.\nï¿½ Hold on gently.\nBEST PRACTICES\nï¿½ Embrace danger.\nï¿½ Use your resources.\nï¿½ Tell the story.\nï¿½ Discover your character.\nFor more information, see the Daggerheart Core Rulebook, pages 9 and 108.'}, np.float32(0.985603)), ({'text': 'WHAT IS THIS?\nThis is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.\nYou can use this SRD in several ways:\nï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.\nï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.\nï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).\nï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.\nIn short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!\nTHE BASICS', 'headings': None, 'score': 0.7169945240020752, 'formatted': 'WHAT IS THIS?\nThis is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.\nYou can use this SRD in several ways:\nï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.\nï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.\nï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).\nï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.\nIn short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!\nTHE BASICS'}, np.float32(0.8955001))] [file=search_files.py:204]
+[2025-07-04 14:12:29] AI_DM_RAG [DEBUG] [search_files] Formatted prompt for Ollama:
+You are an expert RPG assistant.
+1. [Score: 0.9934] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+2. [Score: 0.9856] []
+FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.
+PLAYER PRINCIPLES & BEST PRACTICES
+To get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:
+PRINCIPLES
+ï¿½ Be a fan of your character and their journey.
+ï¿½ Spotlight your friends.
+ï¿½ Address the characters and address the players.
+ï¿½ Build the world together.
+ï¿½ Play to find out what happens.
+ï¿½ Hold on gently.
+BEST PRACTICES
+ï¿½ Embrace danger.
+ï¿½ Use your resources.
+ï¿½ Tell the story.
+ï¿½ Discover your character.
+For more information, see the Daggerheart Core Rulebook, pages 9 and 108.
+
+3. [Score: 0.8955] []
+WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.
+You can use this SRD in several ways:
+ï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.
+ï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.
+ï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).
+ï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.
+In short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!
+THE BASICS
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+User's question: "What is daggerheart?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:120]
+[2025-07-04 14:12:29] AI_DM_RAG [INFO] [search_files] 
+--- Prompt sent to Ollama ---
+ [file=search_files.py:126]
+[2025-07-04 14:12:29] AI_DM_RAG [INFO] [search_files] You are an expert RPG assistant.
+1. [Score: 0.9934] []
+WHAT IS DAGGERHEART?
+Daggerheart is a tabletop roleplaying game for one Game 
+Master (ï¿½GMï¿½) and 2-5 players. Each game session lasts about 2-4 hours, and Daggerheart can be played as a one-shot or a multi-session campaign of any length. 
+During a session of Daggerheart the GM describes situations, narrates events, and controls any adversaries or obstacles that the Player Characters (ï¿½PCsï¿½) encounter. The players, in turn, roleplay their PCsï¿½ reactions to the scenario presented by the GM. If the outcome of a playerï¿½s action depends on fate or fortune, the GM calls for an action roll.
+When a player makes an action roll, they utilize Duality Diceï¿½two differently colored 12-sided dice (ï¿½d12sï¿½) representing Hope and Fear. The Duality Dice are rolled, relevant modifiers are added to the results, and the total is compared to a Difficulty set by the GM. If the total meets or beats the Difficulty, the player succeeds. If itï¿½s lower, they fail. In addition, the situation changes based on which Duality Die rolls higher, either giving the player helpful Hope tokens or generating terrifying Fear tokens for the GM.
+
+2. [Score: 0.9856] []
+FLOW OF THE GAME
+Daggerheart is a conversation. The GM describes fictional scenarios involving the PCs, and the players take turns describing how their characters react. The goal of every person at the table is to build upon everyone elseï¿½s ideas and collaboratively tell a satisfying story. The system facilitates this collaborative process by providing structure to the conversation and mechanics for resolving moments of tension where fate or fortune determine the outcome of events.
+PLAYER PRINCIPLES & BEST PRACTICES
+To get the most out of Daggerheart, we recommend players keep the following principles and practices in mind throughout each session:
+PRINCIPLES
+ï¿½ Be a fan of your character and their journey.
+ï¿½ Spotlight your friends.
+ï¿½ Address the characters and address the players.
+ï¿½ Build the world together.
+ï¿½ Play to find out what happens.
+ï¿½ Hold on gently.
+BEST PRACTICES
+ï¿½ Embrace danger.
+ï¿½ Use your resources.
+ï¿½ Tell the story.
+ï¿½ Discover your character.
+For more information, see the Daggerheart Core Rulebook, pages 9 and 108.
+
+3. [Score: 0.8955] []
+WHAT IS THIS?
+This is the Daggerheart SRD (System Reference Document). It is a repository of the mechanical elements of the Daggerheart system, edited and organized for clarity, conciseness, and quick reference.
+You can use this SRD in several ways:
+ï¿½ To quickly look up Daggerheartï¿½s rules-as-written during gameplay sessions.
+ï¿½ To ensure any homebrew content you create or publish conforms with Daggerheartï¿½s core ruleset.
+ï¿½ To provide copy text made available by Darrington Press for your own publications under their Community Gaming License (www.darringtonpress.com/license).
+ï¿½ To better understand the mechanics of Daggerheart, absent the flavor and setting information, so you can bend or break them in the process of making your own content. The Daggerheart SRD is not a replacement for the core rulebook, which contains setting information, additional examples of various gameplay elements, and tons of great advice for playing Daggerheartï¿½not to mention gorgeous artwork and layout.
+In short, it is Daggerheart, the system, boiled down to the bonesï¿½a lean and clean offering without all the flavor, style, and supporting material that makes the core rulebook such an evocative and enjoyable read. We hope this document proves useful to your table. Happy adventuring!
+THE BASICS
+
+
+Conversation so far:
+System: You are a helpful assistant.
+User: What is daggerheart?
+User's question: "What is daggerheart?"
+
+Please answer the user's question using the information above. Summarize or explain as needed, and cite the section(s) and confidence score(s) you used. [file=search_files.py:127]
+[2025-07-04 14:12:29] AI_DM_RAG [INFO] [search_files] 
+--- End of prompt ---
+ [file=search_files.py:128]
+[2025-07-04 14:12:29] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTP connection (1): localhost:11434 [file=connectionpool.py:241]
+[2025-07-04 14:12:33] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://localhost:11434 "POST /api/generate HTTP/1.1" 200 None [file=connectionpool.py:544]
+[2025-07-04 14:12:33] AI_DM_RAG [DEBUG] [__main__] Answer: Based on the provided text, Daggerheart is a tabletop roleplaying game designed for 2-5 players, with one Game Master (GM). It's described in Section 1 [Score: 0.9934] as a game where the GM sets scenarios and narrates events, while players roleplay their characters' reactions to these situations.
+
+The game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions. The game is all about collaborative storytelling, with the goal of building upon each other's ideas and creating a satisfying narrative.
+
+So, Daggerheart is a tabletop RPG that focuses on conversation, using mechanics like Duality Dice to facilitate player-GM interaction and drive the story forward. [file=dungeon_master_api.py:75]
+[2025-07-04 14:12:33] AI_DM_RAG [DEBUG] [__main__] Used Knowledge Bases: ['core_rules'] [file=dungeon_master_api.py:76]
+[2025-07-04 14:12:33] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 14:12:33] "POST /api/v1.0/hybrid_search HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 14:12:33] AI_DM_RAG [DEBUG] [urllib3.connectionpool] http://127.0.0.1:5001 "POST /api/v1.0/hybrid_search HTTP/1.1" 200 822 [file=connectionpool.py:544]
+[2025-07-04 14:12:33] AI_DM_RAG [DEBUG] [__main__] DM API request payload: [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'What is daggerheart?'}], ['core_rules'] [file=chatbox_server.py:34]
+[2025-07-04 14:12:33] AI_DM_RAG [DEBUG] [__main__] DM API request URL: http://127.0.0.1:5001/api/v1.0/hybrid_search [file=chatbox_server.py:35]
+[2025-07-04 14:12:33] AI_DM_RAG [INFO] [__main__] DM API response status: 200 [file=chatbox_server.py:36]
+[2025-07-04 14:12:33] AI_DM_RAG [DEBUG] [__main__] DM API response content: {
+  "response": "Based on the provided text, Daggerheart is a tabletop roleplaying game designed for 2-5 players, with one Game Master (GM). It's described in Section 1 [Score: 0.9934] as a game where the GM sets scenarios and narrates events, while players roleplay their characters' reactions to these situations.\n\nThe game uses Duality Dice, two differently colored 12-sided dice representing Hope and Fear, to determine the outcome of players' actions. The game is all about collaborative storytelling, with the goal of building upon each other's ideas and creating a satisfying narrative.\n\nSo, Daggerheart is a tabletop RPG that focuses on conversation, using mechanics like Duality Dice to facilitate player-GM interaction and drive the story forward.",
+  "success": true,
+  "used_kbs": [
+    "core_rules"
+  ]
+}
+ [file=chatbox_server.py:37]
+[2025-07-04 14:12:33] AI_DM_RAG [INFO] [werkzeug] 127.0.0.1 - - [04/Jul/2025 14:12:33] "POST /chat HTTP/1.1" 200 - [file=_internal.py:97]
+[2025-07-04 19:42:41] AI_DM_RAG [INFO] [__main__] Auto-detected settings: [file=hardware_adjustment_scripts.py:62]
+[2025-07-04 19:42:41] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Load pretrained SentenceTransformer: BAAI/bge-large-en-v1.5 [file=SentenceTransformer.py:113]
+[2025-07-04 19:42:41] AI_DM_RAG [DEBUG] [urllib3.connectionpool] Starting new HTTPS connection (1): huggingface.co:443 [file=connectionpool.py:1049]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/config_sentence_transformers.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/config_sentence_transformers.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/sentence_bert_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/sentence_bert_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:42] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:45] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:45] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:42:45] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-large-en-v1.5/revision/main HTTP/1.1" 200 148831 [file=connectionpool.py:544]
+[2025-07-04 19:59:42] AI_DM_RAG [INFO] [__main__] Starting the Dungeon Master API and Flask app... [file=main.py:14]
+[2025-07-04 19:59:48] AI_DM_RAG [INFO] [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000 [file=_internal.py:97]
+[2025-07-04 19:59:48] AI_DM_RAG [INFO] [werkzeug] [33mPress CTRL+C to quit[0m [file=_internal.py:97]
+[2025-07-04 19:59:48] AI_DM_RAG [INFO] [werkzeug]  * Restarting with stat [file=_internal.py:97]
+[2025-07-04 19:59:48] AI_DM_RAG [DEBUG] [faiss.loader] Environment variable FAISS_OPT_LEVEL is not set, so let's pick the instruction set according to the current CPU [file=loader.py:62]
+[2025-07-04 19:59:48] AI_DM_RAG [INFO] [faiss.loader] Loading faiss with AVX2 support. [file=loader.py:86]
+[2025-07-04 19:59:48] AI_DM_RAG [INFO] [faiss.loader] Successfully loaded faiss with AVX2 support. [file=loader.py:88]
+[2025-07-04 19:59:48] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Load pretrained SentenceTransformer: BAAI/bge-large-en-v1.5 [file=SentenceTransformer.py:113]
+[2025-07-04 19:59:48] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/config_sentence_transformers.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/config_sentence_transformers.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:49] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/sentence_bert_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/sentence_bert_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:50] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-large-en-v1.5/revision/main HTTP/1.1" 200 148831 [file=connectionpool.py:544]
+[2025-07-04 19:59:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /cross-encoder/ms-marco-electra-base/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:51] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/cross-encoder/ms-marco-electra-base/d720fd788e14b2687f0e27cfa23f25b59e495f4b/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Load pretrained SentenceTransformer: BAAI/bge-large-en-v1.5 [file=SentenceTransformer.py:113]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/config_sentence_transformers.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/config_sentence_transformers.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/README.md HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/README.md HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/modules.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/modules.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/sentence_bert_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/sentence_bert_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:52] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /BAAI/bge-large-en-v1.5/resolve/main/tokenizer_config.json HTTP/1.1" 307 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "HEAD /api/resolve-cache/models/BAAI/bge-large-en-v1.5/d4aa6901d3a41ba39fb536a557fa166f842b0e09/tokenizer_config.json HTTP/1.1" 200 0 [file=connectionpool.py:544]
+[2025-07-04 19:59:53] AI_DM_RAG [WARNING] [werkzeug]  * Debugger is active! [file=_internal.py:97]
+[2025-07-04 19:59:53] AI_DM_RAG [INFO] [werkzeug]  * Debugger PIN: 988-085-720 [file=_internal.py:97]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [urllib3.connectionpool] https://huggingface.co:443 "GET /api/models/BAAI/bge-large-en-v1.5/revision/main HTTP/1.1" 200 148831 [file=connectionpool.py:544]
+[2025-07-04 19:59:53] AI_DM_RAG [INFO] [sentence_transformers.SentenceTransformer] Use pytorch device_name: cuda [file=SentenceTransformer.py:219]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [__main__] Starting the Dungeon Master API Flask app... [file=dungeon_master_api.py:143]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [__main__] /static/<path:filename> [file=dungeon_master_api.py:146]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [__main__] / [file=dungeon_master_api.py:146]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [__main__] /api/v1.0/roll_dice [file=dungeon_master_api.py:146]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [__main__] /api/v1.0/hybrid_search [file=dungeon_master_api.py:146]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [__main__] /refresh_embeddings [file=dungeon_master_api.py:146]
+[2025-07-04 19:59:53] AI_DM_RAG [DEBUG] [__main__] /knowledge_bases [file=dungeon_master_api.py:146]
+[2025-07-04 19:59:53] AI_DM_RAG [INFO] [werkzeug] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001 [file=_internal.py:97]
+[2025-07-04 19:59:53] AI_DM_RAG [INFO] [werkzeug] [33mPress CTRL+C to quit[0m [file=_internal.py:97]

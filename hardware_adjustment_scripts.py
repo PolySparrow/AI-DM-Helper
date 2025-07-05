@@ -3,11 +3,9 @@ import multiprocessing
 import psutil
 from sentence_transformers import SentenceTransformer
 import sys
-import logging
-from logging_function import setup_logger 
 
-setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
-logger = logging.getLogger(__name__)
+
+
 
 def get_device():
     return 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -36,10 +34,10 @@ def pick_settings():
             model = "BAAI/bge-large-en-v1.5"
             batch_size = 64
         else:
-            model = "all-MiniLM-L6-v2"
+            model = "BAAI/bge-base-en-v1.5"
             batch_size = 32
     else:
-        model = "all-MiniLM-L6-v2"
+        model = "BAAI/bge-base-en-v1.5"
         batch_size = 8 if ram_gb < 8 else 16
     max_workers = min(num_cores, 8)
     return {
@@ -50,14 +48,14 @@ def pick_settings():
         "ram_gb": ram_gb,
         "gpu_mem_gb": gpu_mem_gb,
     }
-logger.info("Python executable:", sys.executable)
-logger.info("Torch version:", torch.__version__)
-logger.info("CUDA available:", torch.cuda.is_available())
+print("Python executable:", sys.executable)
+print("Torch version:", torch.__version__)
+print("CUDA available:", torch.cuda.is_available())
 if torch.cuda.is_available():
-    logger.info("CUDA device count:", torch.cuda.device_count())
-    logger.info("CUDA device name:", torch.cuda.get_device_name(0))
+    print("CUDA device count:", torch.cuda.device_count())
+    print("CUDA device name:", torch.cuda.get_device_name(0))
 else:
-    logger.info("No CUDA device detected.")
+    print("No CUDA device detected.")
 settings = pick_settings()
-logger.info("Auto-detected settings:", settings)
+print("Auto-detected settings:", settings)
 embedder = SentenceTransformer(settings["model"], device=settings["device"])

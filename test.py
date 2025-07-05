@@ -14,3 +14,5 @@ try:
     print("Response JSON:", response.json())
 except Exception as e:
     print("Request failed:", e)
+
+    #& "C:\Program Files\Python311\python.exe" main.py
