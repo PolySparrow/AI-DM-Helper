@@ -10,17 +10,19 @@ import PyPDF2
 import pdfplumber
 from docx import Document
 import openpyxl
-from sentence_transformers import SentenceTransformer
-from collections import defaultdict
-from sentence_transformers import util
 from logging_function import setup_logger
 import logging
 import time
 import hashlib
+import requests
 from environment_vars import EMBEDDING_MODEL, EMBEDDINGS_DIR, CHUNKS_DIR, SOURCE_DIR, DEVICE
+from rake_nltk import Rake
+from keybert import KeyBERT
+import spacy
 
 setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
+
 
 patterns = [
     r'page\s*\d+',
@@ -34,6 +36,19 @@ patterns = [
     r'^\d+\.\s+',
     r'\xa0',
 ]
+
+def extract_tags_api(text, top_n=5):
+    response = requests.post(
+        "http://localhost:5001/extract_tags",  # Your tag extraction endpoint
+        json={"text": text, "top_n": top_n}
+    )
+    response.raise_for_status()
+    return response.json().get("tags", [])
+
+def get_remote_embeddings(texts):
+    response = requests.post("http://localhost:5001/embed", json={"texts": texts})
+    response.raise_for_status()
+    return np.array(response.json()["embeddings"])
 
 def read_headings_csv(csv_path):
     headings = []
@@ -358,8 +373,9 @@ def extract_chunks_from_table(
     return chunks
 
 # ========== EMBEDDING ==========
-def get_embeddings(texts, embedder):
-    return embedder.encode(texts, normalize_embeddings=True)
+def get_embeddings(texts):
+    # Ignore embedder, use remote call
+    return get_remote_embeddings(texts)
 
 # ========== OUTPUT PATHS ==========
 def get_output_paths(source_path, embeddings_dir=EMBEDDINGS_DIR, chunks_dir=CHUNKS_DIR):
@@ -447,7 +463,6 @@ def load_previous_chunks_and_embeddings(chunks_path, embeddings_path):
 # ========== MAIN WORKFLOW ==========
 def embedding_generator(
     FILE_PATH,
-    embedder,
     BATCH_SIZE=20,
     headings_csv_path="./source/Daggerheart_context_extended.csv",
     heading_columns=None,
@@ -474,17 +489,22 @@ def embedding_generator(
         
         logger.debug("Splitting by headings...")
         chunk_dicts = chunk_by_headings_sequential(full_text, headings)
-        texts = [c["text"] for c in chunk_dicts]
+        texts = []
+        for c in chunk_dicts:
+            c["tags"] = extract_tags_api(c["text"], top_n=5)
+            texts.append(c["text"])
     elif base.lower() == "adversaries" or base.lower() == "environments":
         logger.debug("Special stat block chunking for adversaries.pdf ...")
         stat_blocks = chunk_stat_blocks_from_pdf(FILE_PATH)
         chunk_dicts = []
         for idx, block in enumerate(stat_blocks):
             logger.debug('Processing block:', idx, block["name"])
+            tags = extract_tags_api(block["text"], top_n=5)
             chunk_dicts.append({
                 "index": idx,
                 "name": block["name"],
                 "page": block["page"],
+                "tags": tags,
                 "text": preprocess_text(block["text"])
             })
         texts = [c["text"] for c in chunk_dicts]
@@ -493,11 +513,13 @@ def embedding_generator(
         card_blocks = chunk_domain_cards_from_pdf(FILE_PATH)
         chunk_dicts = []
         for idx, block in enumerate(card_blocks):
+            tags = extract_tags_api(block["text"], top_n=5)
             chunk_dicts.append({
                 "index": idx,
                 "domain": block["domain"],
                 "name": block["name"],
                 "page": block["page"],
+                "tags": tags,
                 "text": preprocess_text(block["text"])
             })
         texts = [c["text"] for c in chunk_dicts]
@@ -511,9 +533,11 @@ def embedding_generator(
         raw_sections = [(h, preprocess_text(s)) for h, s in raw_sections]
         chunk_dicts = []
         for idx, (headings, text) in enumerate(raw_sections):
+            tags = extract_tags_api(block["text"], top_n=5)
             chunk_dicts.append({
                 "index": idx,
                 "headings": headings,
+                "tags": tags,
                 "text": text
             })
         texts = [c["text"] for c in chunk_dicts]
@@ -534,9 +558,11 @@ def embedding_generator(
         raw_sections = [(h, preprocess_text(s)) for h, s in section_chunks]
         chunk_dicts = []
         for idx, (headings, text) in enumerate(raw_sections):
+            tags = extract_tags_api(block["text"], top_n=5)
             chunk_dicts.append({
                 "index": idx,
                 "headings": headings,
+                "tags": tags,
                 "text": text
             })
         texts = [c["text"] for c in chunk_dicts]
@@ -546,18 +572,22 @@ def embedding_generator(
         raw_sections = [(h, preprocess_text(s)) for h, s in section_chunks]
         chunk_dicts = []
         for idx, (headings, text) in enumerate(raw_sections):
+            tags = extract_tags_api(text, top_n=5)
             chunk_dicts.append({
                 "index": idx,
                 "headings": headings,
+                "tags": tags,
                 "text": text
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext == ".txt":
         logger.debug("Extracting and chunking TXT...")
         full_text = extract_text_from_txt(FILE_PATH)
+        tags = extract_tags_api(text, top_n=5)
         chunk_dicts = [{
             "index": 0,
             "headings": None,
+            "tags": tags,
             "text": preprocess_text(full_text)
         }]
         texts = [chunk_dicts[0]["text"]]
@@ -598,11 +628,13 @@ def embedding_generator(
             to_embed_indices.append(idx)
 
     # 4. Embed only new/changed chunks in batches
+    # 4. Embed only new/changed chunks in batches
     if to_embed:
         logger.info(f"Delta embedding: {len(to_embed)} new/changed chunks out of {len(chunk_dicts)}")
         for i in range(0, len(to_embed), BATCH_SIZE):
             batch_texts = to_embed[i:i+BATCH_SIZE]
-            batch_embeddings = get_embeddings(batch_texts, embedder)
+            # Use remote embedding call
+            batch_embeddings = get_remote_embeddings(batch_texts)
             for j, emb in enumerate(batch_embeddings):
                 idx_in_new = to_embed_indices[i + j]
                 new_embeddings[idx_in_new] = emb
@@ -620,9 +652,6 @@ def embedding_generator(
 
 if __name__ == "__main__":
     start = time.perf_counter()
-
-    embedder = SentenceTransformer(EMBEDDING_MODEL, device=DEVICE)
-
     # Example: process all files in ./source
     source_dir = SOURCE_DIR
     skip_files = {
@@ -645,7 +674,6 @@ if __name__ == "__main__":
         FILE_PATH = os.path.join(source_dir, fname)
         embedding_generator(
             FILE_PATH,
-            embedder=embedder,
             headings_csv_path="./source/Daggerheart_context_extended.csv"
         )
     end = time.perf_counter()

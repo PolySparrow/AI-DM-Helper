@@ -6,9 +6,37 @@ from logging_function import setup_logger
 import os
 from environment_vars import OLLAMA_URL, OLLAMA_MODEL, SOURCE_DIR
 import logging
+from rake_nltk import Rake
+from keybert import KeyBERT
+import spacy
+
 setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
+
+
+rake = Rake()
+kw_model = KeyBERT()
+nlp = spacy.load("en_core_web_sm")
+
+def extract_tags(text, top_n=5):
+    tags = set()
+    # RAKE
+    rake.extract_keywords_from_text(text)
+    tags.update(rake.get_ranked_phrases()[:top_n])
+    # KeyBERT
+    try:
+        keybert_keywords = kw_model.extract_keywords(text, top_n=top_n)
+        tags.update([kw for kw, _ in keybert_keywords])
+    except Exception as e:
+        print(f"KeyBERT failed: {e}")
+    # spaCy noun chunks and entities
+    doc = nlp(text)
+    tags.update([chunk.text for chunk in doc.noun_chunks])
+    tags.update([ent.text for ent in doc.ents])
+    # Clean up
+    tags = {t.strip().lower() for t in tags if t.strip()}
+    return list(tags)
 
 def format_history_for_llama(history):
     role_map = {

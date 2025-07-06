@@ -16,10 +16,18 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
-# ========== CONFIG ==========
+def extract_tags_api(text, top_n=5):
+    response = requests.post(
+        "http://localhost:5001/extract_tags",  # Your tag extraction endpoint
+        json={"text": text, "top_n": top_n}
+    )
+    response.raise_for_status()
+    return response.json().get("tags", [])
 
-embedder = SentenceTransformer(EMBEDDING_MODEL, device=DEVICE)
-reranker = CrossEncoder(CROSS_ENCODER_MODEL, device=DEVICE)
+def prefilter_chunks(chunks, query, top_n=5):
+    query_tags = set(extract_tags_api(query, top_n=top_n))
+    filtered = [chunk for chunk in chunks if set(chunk.get("tags", [])) & query_tags]
+    return filtered
 
 # ========== DYNAMIC LOADING ==========
 def load_all_indexes(embeddings_dir, chunks_dir):
@@ -33,7 +41,8 @@ def load_all_indexes(embeddings_dir, chunks_dir):
                 embeddings = np.load(emb_path)
                 with open(json_path, "r", encoding="utf-8") as f:
                     chunks = json.load(f)
-                index = faiss.IndexFlatIP(embeddings.shape[1])
+                index = faiss.IndexHNSWFlat(embeddings.shape[1], 32)  # 32 is M, the number of neighbors (tune as needed)
+                index.hnsw.efSearch = 64  # (optional) controls recall/speed tradeoff, can tune higher for better recall
                 index.add(embeddings)
                 knowledge_bases[kb_name] = {"index": index, "chunks": chunks}
             else:
@@ -62,10 +71,18 @@ def expand_query_with_wordnet(query):
     return list(expanded_queries)
 
 # ========== DYNAMIC SEARCH ==========
-def search_kb(query, kb, embedder, k=1):
+def search_kb(query, kb, k=1,prefilter=True, top_n=5):
     index = kb["index"]
     chunks = kb["chunks"]
-    query_embedding = embedder.encode([query], normalize_embeddings=True)
+    if prefilter:
+        query_tags = set(extract_tags_api(query, top_n=top_n))
+        filtered_indices = [i for i, chunk in enumerate(chunks) if set(chunk.get("tags", [])) & query_tags]
+        if not filtered_indices:
+            logger.info("No chunks matched pre-filtering, using all chunks.")
+            filtered_indices = list(range(len(chunks)))
+    else:
+        filtered_indices = list(range(len(chunks)))
+    query_embedding = get_embeddings([query])
     assert query_embedding.shape[1] == index.d, f"Embedding dim {query_embedding.shape[1]} != index dim {index.d}"
     distances, indices = index.search(query_embedding, k)
     results = []
@@ -83,12 +100,6 @@ def search_kb(query, kb, embedder, k=1):
         })
     return results
 
-# ========== RERANKING ==========
-def rerank(query, results, top_n=3):
-    pairs = [(query, r['text']) for r in results]
-    scores = reranker.predict(pairs)
-    reranked = sorted(zip(results, scores), key=lambda x: -x[1])
-    return reranked[:top_n]  # List of (result, score) tuples
 
 # ========== PROMPT FORMATTING ==========
 def format_prompt(results, user_query, chunk_char_limit=None, low_confidence_msg="", history=None):
@@ -121,15 +132,16 @@ def format_prompt(results, user_query, chunk_char_limit=None, low_confidence_msg
     return prompt
 
 # ========== SUMMARIZATION WITH OLLAMA ==========
-def summarize_with_ollama(reranked_results, user_query, model=OLLAMA_MODEL, low_confidence_msg="", history=None):
-    prompt = format_prompt(reranked_results, user_query, low_confidence_msg=low_confidence_msg, history=history)
-    logger.info("\n--- Prompt sent to Ollama ---\n")
-    logger.info(prompt)
-    logger.info("\n--- End of prompt ---\n")
-    response = requests.post(
-        OLLAMA_URL,
-        json={"model": model, "prompt": prompt, "stream": False}
-    )
+def get_embeddings(texts):
+    response = requests.post("http://localhost:5001/embed", json={"texts": texts})
+    return np.array(response.json()["embeddings"])
+
+def rerank(pairs):
+    response = requests.post("http://localhost:5001/rerank", json={"pairs": pairs})
+    return response.json()["scores"]
+
+def call_llama(prompt, model=OLLAMA_MODEL):
+    response = requests.post("http://localhost:5001/llama", json={"model": model, "prompt": prompt, "stream": False})
     return response.json()["response"]
 
 # ========== HYBRID SEARCH: QUERY EXPANSION + RERANKING ==========
@@ -150,7 +162,7 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
             logger.info(f"Knowledge base '{kb_name}' not found. Skipping.")
             return []
         kb = knowledge_bases[kb_name]
-        results = search_kb(q, kb, embedder, k=10)
+        results = search_kb(q, kb, k=10)
         for r in results:
             r_copy = r.copy()
             r_copy["kb_name"] = kb_name
@@ -176,7 +188,7 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
     logger.debug(f"Starting reranking of unique results: {len(unique_results)}...")
     pairs = [(user_query, r['text']) for r in unique_results]
     if pairs:
-        scores = reranker.predict(pairs)
+        scores = rerank(pairs)
         reranked = sorted(zip(unique_results, scores), key=lambda x: -x[1])
         reranked_results = reranked[:k]
         reranked_results = [(r, score) for r, score in reranked_results if score >= confidence_threshold]
@@ -202,11 +214,10 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
         low_confidence_msg = ""
     logger.info(f"Top score: {top_score:.4f} (threshold: {confidence_threshold})")
     logger.debug(f"Reranked results: {reranked_results}")
-
+    prompt = format_prompt(reranked_results, user_query, low_confidence_msg=low_confidence_msg, history=history)
     # Summarize with Ollama, passing both result and score, and add warning to prompt
-    summary = summarize_with_ollama(
-        reranked_results, user_query, model=model, low_confidence_msg=low_confidence_msg, history=history
-    )
+    summary = call_llama(prompt)
+        
     if low_confidence_msg:
         return low_confidence_msg + summary, list(kb_names)
     else:

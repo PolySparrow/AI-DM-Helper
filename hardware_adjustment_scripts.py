@@ -31,7 +31,7 @@ def pick_settings():
             model = "BAAI/bge-large-en-v1.5"
             batch_size = 128
         elif gpu_mem_gb >= 10:
-            model = "BAAI/bge-large-en-v1.5"
+            model = "BAAI/bge-base-en-v1.5"
             batch_size = 64
         else:
             model = "BAAI/bge-base-en-v1.5"

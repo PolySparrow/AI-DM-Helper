@@ -9,11 +9,13 @@ import dungeon_master_functions as dm_functions
 import search_files as search_files
 import requests
 from build_embeddings import embedding_generator
-from sentence_transformers import SentenceTransformer
-from environment_vars import 	OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, SOURCE_DIR, KNOWLEDGE_BASES, KB_DESCRIPTIONS, MAX_WORKERS
+from sentence_transformers import SentenceTransformer, CrossEncoder
+from environment_vars import 	OLLAMA_URL, OLLAMA_MODEL, EMBEDDING_MODEL, SOURCE_DIR, KNOWLEDGE_BASES, KB_DESCRIPTIONS, MAX_WORKERS,CROSS_ENCODER_MODEL, DEVICE
 import logging
-
 import os
+from rake_nltk import Rake
+from keybert import KeyBERT
+import spacy
 # Setup logger
 
 
@@ -25,7 +27,9 @@ CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
 
-embedder = SentenceTransformer(EMBEDDING_MODEL)
+embedder = SentenceTransformer(EMBEDDING_MODEL, device='cpu')
+reranker = CrossEncoder(CROSS_ENCODER_MODEL, device=DEVICE)
+
 
 @app.route('/')
 def home():
@@ -33,20 +37,35 @@ def home():
     return render_template('~Endpoints~<br/>' 
     '/api/v1.0/modeler_agent<br/>')
     
+@app.route('/extract_tags', methods=['POST'])
+def extract_tags_endpoint():
+    data = request.get_json()
+    text = data.get("text", "")
+    top_n = data.get("top_n", 5)
+    tags = dm_functions.extract_tags(text, top_n=top_n)  # Your local extract_tags function
+    return jsonify({"tags": tags})
 
-def get_embeddings(texts, client):
-    response = client.embeddings.create(
-    input=texts,
-    model="text-embedding-3-small"
-    )
-    return np.array([d.embedding for d in response.data], dtype="float32")
+@app.route('/embed', methods=['POST'])
+def embed():
+    data = request.get_json()
+    texts = data['texts']
+    embeddings = embedder.encode(texts, normalize_embeddings=True)
+    return jsonify({"embeddings": np.array(embeddings).tolist()})
 
+@app.route('/rerank', methods=['POST'])
+def rerank():
+    data = request.get_json()
+    pairs = data['pairs']  # list of [query, doc]
+    scores = reranker.predict(pairs).tolist()
+    return jsonify({"scores": scores})
 
-#@app.route('/api/v1.0/chat', methods=['POST'])
-#def CallChat():
-#    f = json.loads(request.data)
-#    response = dm_functions.Chat(f)
-#    return response
+@app.route('/llama', methods=['POST'])
+def llama():
+    data = request.get_json()
+    # Forward to Ollama or run your LLM here
+    import requests
+    response = requests.post(OLLAMA_URL, json=data)
+    return jsonify(response.json())
 
 @app.route('/api/v1.0/roll_dice', methods=['POST'])
 def roll_dice_route():
@@ -105,7 +124,6 @@ def refresh_embeddings():
             logger.info(f"Starting embedding generation for {kb_name} at {file_path}")
             embedding_generator(
                 FILE_PATH=file_path,
-                embedder=embedder,
                 BATCH_SIZE=128,
                 headings_csv_path="./source/Daggerheart_context_extended.csv"
             )
