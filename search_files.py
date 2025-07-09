@@ -75,29 +75,36 @@ def search_kb(query, kb, k=1,prefilter=True, top_n=5):
     index = kb["index"]
     chunks = kb["chunks"]
     if prefilter:
-        query_tags = set(extract_tags_api(query, top_n=top_n))
-        filtered_indices = [i for i, chunk in enumerate(chunks) if set(chunk.get("tags", [])) & query_tags]
-        if not filtered_indices:
+        # Use your prefilter_chunks function
+        filtered_chunks = prefilter_chunks(chunks, query, top_n=top_n)
+        if not filtered_chunks:
             logger.info("No chunks matched pre-filtering, using all chunks.")
-            filtered_indices = list(range(len(chunks)))
+            filtered_chunks = chunks
     else:
-        filtered_indices = list(range(len(chunks)))
+        filtered_chunks = chunks
+
+    filtered_indices = [chunks.index(chunk) for chunk in filtered_chunks]
+
     query_embedding = get_embeddings([query])
     assert query_embedding.shape[1] == index.d, f"Embedding dim {query_embedding.shape[1]} != index dim {index.d}"
     distances, indices = index.search(query_embedding, k)
+
     results = []
     for rank, i in enumerate(indices[0]):
-        chunk = chunks[i]
-        heading_str = ""
-        if chunk.get("headings"):
-            heading_str = " | ".join(f"{k}: {v}" for k, v in chunk["headings"].items() if v)
-            heading_str = f"[{heading_str}] " if heading_str else ""
-        results.append({
-            "text": chunk["text"],
-            "headings": chunk.get("headings"),
-            "score": float(distances[0][rank]),
-            "formatted": f"{heading_str}{chunk['text']}"
-        })
+        if i in filtered_indices:
+            chunk = chunks[i]
+            heading_str = ""
+            if chunk.get("headings"):
+                heading_str = " | ".join(f"{k}: {v}" for k, v in chunk["headings"].items() if v)
+                heading_str = f"[{heading_str}] " if heading_str else ""
+            results.append({
+                "text": chunk["text"],
+                "headings": chunk.get("headings"),
+                "score": float(distances[0][rank]),
+                "formatted": f"{heading_str}{chunk['text']}"
+            })
+            if len(results) >= k:
+                break
     return results
 
 

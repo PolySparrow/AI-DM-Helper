@@ -383,6 +383,7 @@ def get_output_paths(source_path, embeddings_dir=EMBEDDINGS_DIR, chunks_dir=CHUN
     embeddings_path = os.path.join(embeddings_dir, f"{base}_embeddings.npy")
     chunks_path = os.path.join(chunks_dir, f"{base}_chunks.json")
     return embeddings_path, chunks_path
+
 def chunk_by_headings_sequential(full_text, headings):
     lines = full_text.split('\n')
     chunks = []
