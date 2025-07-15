@@ -530,6 +530,8 @@ def embedding_generator(
             # Deduplicate and clean
             tags = list({t.strip().lower() for t in tags if t.strip()})
             c["tags"] = tags
+            # When building each chunk:
+            c["tag_embeddings"] = get_embeddings(c["tags"]).tolist()
     elif base.lower() == "adversaries" or base.lower() == "environments":
         logger.debug("Special stat block chunking for adversaries.pdf ...")
         stat_blocks = chunk_stat_blocks_from_pdf(FILE_PATH)
@@ -542,7 +544,8 @@ def embedding_generator(
                 "name": block["name"],
                 "page": block["page"],
                 "tags": tags,
-                "text": preprocess_text(block["text"])
+                "text": preprocess_text(block["text"]),
+                "tag_embeddings": get_embeddings(tags).tolist()
             })
         texts = [c["text"] for c in chunk_dicts]
     elif base.lower() == "domain_card_reference":
@@ -557,7 +560,8 @@ def embedding_generator(
                 "name": block["name"],
                 "page": block["page"],
                 "tags": tags,
-                "text": preprocess_text(block["text"])
+                "text": preprocess_text(block["text"]),
+                "tag_embeddings": get_embeddings(tags).tolist()
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext in [".csv", ".xlsx"]:
@@ -575,7 +579,8 @@ def embedding_generator(
                 "index": idx,
                 "headings": headings,
                 "tags": tags,
-                "text": text
+                "text": text,
+                "tag_embeddings": get_embeddings(tags).tolist()
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext == ".pdf":
@@ -600,7 +605,8 @@ def embedding_generator(
                 "index": idx,
                 "headings": headings,
                 "tags": tags,
-                "text": text
+                "text": text,
+                "tag_embeddings": get_embeddings(tags).tolist()
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext == ".docx":
@@ -614,7 +620,8 @@ def embedding_generator(
                 "index": idx,
                 "headings": headings,
                 "tags": tags,
-                "text": text
+                "text": text,
+                "tag_embeddings": get_embeddings(tags).tolist()
             })
         texts = [c["text"] for c in chunk_dicts]
     elif ext == ".txt":
@@ -625,7 +632,8 @@ def embedding_generator(
             "index": 0,
             "headings": None,
             "tags": tags,
-            "text": preprocess_text(full_text)
+            "text": preprocess_text(full_text),
+            "tag_embeddings": get_embeddings(tags).tolist()
         }]
         texts = [chunk_dicts[0]["text"]]
     else:

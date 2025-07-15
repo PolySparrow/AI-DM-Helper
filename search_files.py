@@ -28,24 +28,31 @@ def knn_tag_prefilter(chunks, query, k=10, tag_top_n=5):
     logger.debug(f"Prefiltering {len(chunks)} chunks with query: {query}")
     # 1. Extract and embed query tags
     query_tags = extract_tags_api(query, top_n=tag_top_n)
-    query_tag_embs = get_embeddings(query_tags)
+    if not query_tags:
+        logger.info("No query tags extracted; returning all chunks.")
+        return chunks[:k]
+    query_tag_embs = get_embeddings(query_tags)  # shape: (num_query_tags, emb_dim)
     logger.debug(f"Query tags: {query_tags}, embeddings shape: {query_tag_embs.shape}")
-    # 2. For each chunk, embed its tags and compute max similarity to any query tag
+
+    # 2. For each chunk, use precomputed tag embeddings and compute max similarity to any query tag
     chunk_scores = []
     for chunk in chunks:
-        chunk_tags = chunk.get("tags", [])
-        if not chunk_tags:
+        chunk_tag_embs = np.array(chunk.get("tag_embeddings", []))  # shape: (num_chunk_tags, emb_dim)
+        if chunk_tag_embs.size == 0:
             continue
-        chunk_tag_embs = get_embeddings(chunk_tags)
         # Compute cosine similarity matrix
         sim_matrix = np.dot(query_tag_embs, chunk_tag_embs.T)
+        # Normalize if needed (if embeddings are not already normalized)
+        # sim_matrix = sim_matrix / (np.linalg.norm(query_tag_embs, axis=1, keepdims=True) * np.linalg.norm(chunk_tag_embs, axis=1))
         max_sim = np.max(sim_matrix)  # Best match between any query tag and any chunk tag
         chunk_scores.append((chunk, max_sim))
-    
+
     # 3. Sort by similarity and keep top-k
     chunk_scores.sort(key=lambda x: -x[1])
     top_chunks = [c for c, score in chunk_scores[:k]]
+    logger.debug(f"Returning top {len(top_chunks)} chunks after tag k-NN prefilter.")
     return top_chunks
+    
 
 # ========== DYNAMIC LOADING ==========
 def load_all_indexes(embeddings_dir, chunks_dir):
