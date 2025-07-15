@@ -9,9 +9,43 @@ import logging
 from rake_nltk import Rake
 from keybert import KeyBERT
 import spacy
+import string
+import nltk
+from nltk.corpus import stopwords
 
 setup_logger(app_name="AI_DM_RAG")  # or whatever app name you want
 logger = logging.getLogger(__name__)
+
+# Download stopwords if not already done
+nltk.download('stopwords', quiet=True)
+stop_words = set(stopwords.words('english'))
+
+# Add your own domain-specific banlist
+banlist = {
+    #"player", "players", "game", "game master", "gm", "dice", "action", "turn",
+    #"session", "outcome", "situation", "difficulty", "rolls", "one", "two", "which",
+    #"what", "that", "they", "their", "the", "a", "an", "about", "any", "each", "utilize",
+    #"helpful", "hope", "fear", "fortune", "fate", "obstacles", "addition", "relevant modifiers",
+    #"the results", "the scenario", "the total", "the player", "the players", "the gm",
+    #"the player characters", "the duality dice", "the difficulty", "the outcome", "the situation",
+    # Add more as needed
+}
+
+def is_good_tag(tag):
+    tag = tag.strip().lower()
+    if len(tag) < 3:
+        return False
+    if tag in stop_words or tag in banlist:
+        return False
+    if tag.isdigit():
+        return False
+    if all(c in string.punctuation for c in tag):
+        return False
+    if "ï" in tag or "¿" in tag or "½" in tag or "�" in tag:
+        return False
+    return True
+
+
 
 
 
@@ -34,9 +68,10 @@ def extract_tags(text, top_n=5):
     doc = nlp(text)
     tags.update([chunk.text for chunk in doc.noun_chunks])
     tags.update([ent.text for ent in doc.ents])
-    # Clean up
+    # Clean up and filter
     tags = {t.strip().lower() for t in tags if t.strip()}
-    return list(tags)
+    tags = [t for t in tags if is_good_tag(t)]
+    return tags[:top_n]
 
 def format_history_for_llama(history):
     role_map = {

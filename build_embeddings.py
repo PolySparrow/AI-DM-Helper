@@ -86,7 +86,7 @@ def preprocess_and_get_page_map(text):
     return "\n".join(clean_lines), page_map
 
 def preprocess_text(text, remove_patterns=None):
-    logger.debug("preprocess_text called with remove_patterns:", remove_patterns)
+    logger.debug("preprocess_text called with remove_patterns: %s", remove_patterns)
     if remove_patterns is None:
         remove_patterns = [
             r'page\s*\d+',
@@ -425,6 +425,39 @@ def chunk_by_headings_sequential(full_text, headings):
         last_end = end
     return chunks
 
+def get_heading_tags_from_headings(headings):
+    tags = []
+    if not headings:
+        return tags
+    for key in [
+        "section",
+        "subsection",
+        "subsubsection",
+        "subsubsubsection",
+        "subsubsubsubsection"
+    ]:
+        value = headings.get(key)
+        if value and isinstance(value, str) and value.strip():
+            tags.append(value.strip())
+    return tags
+
+def get_heading_tags_from_chunk(chunk):
+    """
+    Returns a list of all non-empty heading values from the chunk
+    (section, subsection, subsubsection, etc.)
+    """
+    tags = []
+    for key in [
+        "section",
+        "subsection",
+        "subsubsection",
+        "subsubsubsection",
+        "subsubsubsubsection"
+    ]:
+        value = chunk.get(key)
+        if value and isinstance(value, str) and value.strip():
+            tags.append(value.strip())
+    return tags
 
 def extract_full_text_preserve_titles(pdf_path):
     all_text = []
@@ -492,14 +525,17 @@ def embedding_generator(
         chunk_dicts = chunk_by_headings_sequential(full_text, headings)
         texts = []
         for c in chunk_dicts:
-            c["tags"] = extract_tags_api(c["text"], top_n=5)
-            texts.append(c["text"])
+            tags = extract_tags_api(c["text"], top_n=10)
+            tags += get_heading_tags_from_chunk(c)
+            # Deduplicate and clean
+            tags = list({t.strip().lower() for t in tags if t.strip()})
+            c["tags"] = tags
     elif base.lower() == "adversaries" or base.lower() == "environments":
         logger.debug("Special stat block chunking for adversaries.pdf ...")
         stat_blocks = chunk_stat_blocks_from_pdf(FILE_PATH)
         chunk_dicts = []
         for idx, block in enumerate(stat_blocks):
-            logger.debug('Processing block:', idx, block["name"])
+            logger.debug(f'Processing block: {idx}  {block["name"]}')
             tags = extract_tags_api(block["text"], top_n=5)
             chunk_dicts.append({
                 "index": idx,

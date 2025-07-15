@@ -16,7 +16,7 @@ settings = pick_settings()
 DEVICE = settings["device"]
 OLLAMA_URL = "http://localhost:11434/api/generate"
 #OLLAMA_MODEL = "phi-3-mini-128k-instruct.Q4_K_M.gguf" # Adjust as needed
-OLLAMA_MODEL = "llama3"  # Adjust as needed
+OLLAMA_MODEL = "phi3"  # Adjust as needed
 EMBEDDING_MODEL = settings["model"]
 CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-electra-base"
 

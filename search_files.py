@@ -24,10 +24,28 @@ def extract_tags_api(text, top_n=5):
     response.raise_for_status()
     return response.json().get("tags", [])
 
-def prefilter_chunks(chunks, query, top_n=5):
-    query_tags = set(extract_tags_api(query, top_n=top_n))
-    filtered = [chunk for chunk in chunks if set(chunk.get("tags", [])) & query_tags]
-    return filtered
+def knn_tag_prefilter(chunks, query, k=10, tag_top_n=5):
+    logger.debug(f"Prefiltering {len(chunks)} chunks with query: {query}")
+    # 1. Extract and embed query tags
+    query_tags = extract_tags_api(query, top_n=tag_top_n)
+    query_tag_embs = get_embeddings(query_tags)
+    logger.debug(f"Query tags: {query_tags}, embeddings shape: {query_tag_embs.shape}")
+    # 2. For each chunk, embed its tags and compute max similarity to any query tag
+    chunk_scores = []
+    for chunk in chunks:
+        chunk_tags = chunk.get("tags", [])
+        if not chunk_tags:
+            continue
+        chunk_tag_embs = get_embeddings(chunk_tags)
+        # Compute cosine similarity matrix
+        sim_matrix = np.dot(query_tag_embs, chunk_tag_embs.T)
+        max_sim = np.max(sim_matrix)  # Best match between any query tag and any chunk tag
+        chunk_scores.append((chunk, max_sim))
+    
+    # 3. Sort by similarity and keep top-k
+    chunk_scores.sort(key=lambda x: -x[1])
+    top_chunks = [c for c, score in chunk_scores[:k]]
+    return top_chunks
 
 # ========== DYNAMIC LOADING ==========
 def load_all_indexes(embeddings_dir, chunks_dir):
@@ -76,7 +94,7 @@ def search_kb(query, kb, k=1,prefilter=True, top_n=5):
     chunks = kb["chunks"]
     if prefilter:
         # Use your prefilter_chunks function
-        filtered_chunks = prefilter_chunks(chunks, query, top_n=top_n)
+        filtered_chunks = knn_tag_prefilter(chunks, query,k=10 ,tag_top_n=top_n)
         if not filtered_chunks:
             logger.info("No chunks matched pre-filtering, using all chunks.")
             filtered_chunks = chunks
@@ -159,31 +177,25 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
 ):
     if isinstance(kb_names, str):
         kb_names = [kb_names]
-    all_results = []
-    expanded_queries = expand_query_with_wordnet(user_query)
 
-    # --- Parallel search across KBs and expanded queries ---
-    def search_one(args):
-        kb_name, q = args
+    # --- 1. Parallel search across all KBs with the original query ---
+    def search_one(kb_name):
         if kb_name not in knowledge_bases:
             logger.info(f"Knowledge base '{kb_name}' not found. Skipping.")
             return []
         kb = knowledge_bases[kb_name]
-        results = search_kb(q, kb, k=10)
+        results = search_kb(user_query, kb, k=10)
         for r in results:
-            r_copy = r.copy()
-            r_copy["kb_name"] = kb_name
+            r["kb_name"] = kb_name
         return results
 
-    search_args = [(kb_name, q) for kb_name in kb_names for q in expanded_queries]
+    all_results = []
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        logger.debug(f"Starting parallel search for {len(search_args)} queries across {len(kb_names)} KBs...")
-        futures = [executor.submit(search_one, arg) for arg in search_args]
+        futures = [executor.submit(search_one, kb_name) for kb_name in kb_names]
         for future in as_completed(futures):
             all_results.extend(future.result())
 
     # Deduplicate by text
-    logger.debug(f"Start of deduplication. Total results: {len(all_results)}")
     seen = set()
     unique_results = []
     for r in all_results:
@@ -191,8 +203,7 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
             unique_results.append(r)
             seen.add(r["text"])
 
-    # --- Batch reranking ---
-    logger.debug(f"Starting reranking of unique results: {len(unique_results)}...")
+    # Rerank
     pairs = [(user_query, r['text']) for r in unique_results]
     if pairs:
         scores = rerank(pairs)
@@ -202,14 +213,52 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
     else:
         reranked_results = []
 
-    # Print confidence scores and chunk info
-    logger.debug("Top reranked results with confidence scores:")
-    for idx, (result, score) in enumerate(reranked_results, 1):
-        logger.info(f"{idx}. [Score: {score:.4f}] KB: {result.get('kb_name', '')} | Section: {result.get('headings', '')}")
-        logger.debug(f"   {result['text'][:200]}...\n")
+    # If we have strong matches, return them
+    if reranked_results:
+        prompt = format_prompt(reranked_results, user_query, history=history)
+        summary = call_llama(prompt)
+        return summary, list(kb_names)
 
-    # Check top score
-    top_score = reranked_results[0][1] if reranked_results else 0
+    # --- 2. If not, do expanded queries in parallel across all KBs ---
+    logger.info("No strong matches found, expanding query with WordNet...")
+    expanded_queries = expand_query_with_wordnet(user_query)
+    all_results = []
+    search_args = [(kb_name, q) for kb_name in kb_names for q in expanded_queries]
+    def search_expanded(args):
+        kb_name, q = args
+        if kb_name not in knowledge_bases:
+            logger.info(f"Knowledge base '{kb_name}' not found. Skipping.")
+            return []
+        kb = knowledge_bases[kb_name]
+        results = search_kb(q, kb, k=10)
+        for r in results:
+            r["kb_name"] = kb_name
+        return results
+
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = [executor.submit(search_expanded, arg) for arg in search_args]
+        for future in as_completed(futures):
+            all_results.extend(future.result())
+
+    # Deduplicate again
+    seen = set()
+    unique_results = []
+    for r in all_results:
+        if r["text"] not in seen:
+            unique_results.append(r)
+            seen.add(r["text"])
+
+    # Rerank again
+    pairs = [(user_query, r['text']) for r in unique_results]
+    if pairs:
+        scores = rerank(pairs)
+        reranked = sorted(zip(unique_results, scores), key=lambda x: -x[1])
+        reranked_results = reranked[:k]
+        reranked_results = [(r, score) for r, score in reranked_results if score >= confidence_threshold]
+    else:
+        reranked_results = []
+
+    # Prepare prompt and summary
     low_confidence_msg = ""
     if not reranked_results:
         low_confidence_msg = (
@@ -217,14 +266,8 @@ def hybrid_search_in_kbs_with_expansion_and_rerank(
             "Please try to be more specific in your question.\n"
         )
         logger.info("No reranked results above threshold.")
-    else:
-        low_confidence_msg = ""
-    logger.info(f"Top score: {top_score:.4f} (threshold: {confidence_threshold})")
-    logger.debug(f"Reranked results: {reranked_results}")
     prompt = format_prompt(reranked_results, user_query, low_confidence_msg=low_confidence_msg, history=history)
-    # Summarize with Ollama, passing both result and score, and add warning to prompt
     summary = call_llama(prompt)
-        
     if low_confidence_msg:
         return low_confidence_msg + summary, list(kb_names)
     else:
